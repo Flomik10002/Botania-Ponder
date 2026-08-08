@@ -1,0 +1,44 @@
+modLoader = "javafml" #mandatory
+loaderVersion = "${loader_version_range}" #mandatory
+license = "${mod_license}"
+# Client-only: no server-side component, no multiplayer sync needed. Forge skips loading it on
+# dedicated servers and sets displayTest to IGNORE_ALL_VERSION, so a client with this mod can join
+# any server that has Botania (or none at all) without a version-mismatch red X.
+clientSideOnly = true
+
+[[mods]] #mandatory
+modId = "${mod_id}" #mandatory
+version = "${mod_version}" #mandatory
+displayName = "${mod_name}" #mandatory
+authors = "${mod_authors}" #optional
+description = '''${mod_description}''' #mandatory
+
+[[dependencies."${mod_id}"]]
+modId = "forge"
+mandatory = true
+versionRange = "${forge_version_range}"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies."${mod_id}"]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "CLIENT"
+
+# PonderLib supplies the Ponder scene engine this addon registers its scenes through.
+[[dependencies."${mod_id}"]]
+modId = "ponderlib"
+mandatory = true
+versionRange = "[0.5.0,)"
+ordering = "AFTER"
+side = "CLIENT"
+
+# Botania is what this addon documents scenes for.
+[[dependencies."${mod_id}"]]
+modId = "botania"
+mandatory = true
+versionRange = "[1.20.1-454-FORGE,)"
+ordering = "AFTER"
+side = "CLIENT"
