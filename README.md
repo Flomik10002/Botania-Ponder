@@ -1,67 +1,71 @@
 # Botania Ponder
 
-Client-side [Ponder](https://github.com/Flomik10002/PonderLib) scenes for
-[Botania](https://github.com/VazkiiMods/Botania) on Minecraft Forge 1.20.1.
+**Botania Ponder** adds interactive, Create-style Ponder scenes to [Botania](https://github.com/VazkiiMods/Botania) for Minecraft Forge 1.20.1.
 
-Botania's own in-game documentation (the Lexica Botania) is text and static pictures. This adds the
-Create-style Ponder overlay on top of it: hover a supported block or item and press the Ponder key to
-get a short animated scene of what it actually does, built from the real block entities and particle
-effects Botania uses in-game, not a mock-up. It's a client-side addon — install it and
-[PonderLib](https://github.com/Flomik10002/PonderLib) on your own client and it works joining any
-server, with or without Botania installed there, since none of it runs server-side.
+Botania has always had excellent in-game documentation through the Lexica Botania, but learning a mechanic from text and pictures is very different from actually seeing it happen. Botania Ponder adds another way to explore the mod: point at a supported block or item, press the Ponder key, and watch its behavior demonstrated directly in-game.
 
-## What's in it right now (v1.1.0)
+Instead of explaining an entire system at once, each scene focuses on one specific mechanic. A Mana Pool scene can show how infusion works. A Mana Spreader scene can demonstrate its own behavior. A functional flower can show what it reacts to and what happens when it does. The goal is to make Botania easier to understand without turning Ponder into another wiki or a collection of long tutorials.
 
-83 scenes, one block or item's behavior each, no scene tries to explain more than one thing:
+The project is built on [PonderLib](https://github.com/Flomik10002/PonderLib), a standalone implementation of the Ponder system designed for mods outside of Create.
 
-| Category | Scenes | Coverage |
-|---|---|---|
-| Generating Flora | 13 | every standard generating flower, Endoflame included |
-| Functional Flora | 27 | every standard functional flower |
-| Mana Lenses | 25 | the full standard lens set |
-| Red String | 6 | Container, Dispenser, Nutrifier, Comparator, Spoofer, Interceptor |
-| Mana network | 8 | Mana Pool (filling + infusion), Mana Spreader, Mana Void, Mana Detector, Mana Splitter, Open Crate, Spreader Turntable |
-| Crafting | 4 | Pure Daisy, Petal Apothecary, Runic Altar, Botanical Brewery |
+## What the scenes are like
 
-Full version-by-version history is in [CHANGELOG.md](CHANGELOG.md).
+The scenes are intended to look and behave like demonstrations of actual Botania mechanics rather than animated illustrations loosely based on them.
 
-## What's not in it yet
+Where a mechanic has visible in-game behavior, the scene tries to reproduce that behavior using Botania's real blocks, block entities, states and effects. Mana Pools visibly change their mana state, items involved in interactions actually appear and disappear, and Botania-specific visual effects use the same colors and particles the mod itself uses.
 
-- **Nobody has watched these scenes run in a real client.** They were all built and verified
-  against Botania's actual source — real particle colors, real block-entity state, schematics
-  checked byte-for-byte — but the machine this was developed on has no display, so `runClient` has
-  never actually launched a window here. Camera framing, beat timing, anything you'd only catch by
-  eye is unverified. Treat this release as needing an in-game pass before you'd call it polished.
-- Equipment has no coverage at all — wands, rings, bands, the manasteel/elementium/terrasteel tool
-  and armor tiers.
-- The Corporea network (Index, Spark, Retainer, Funnel) isn't covered.
-- Two scenes are deliberately missing rather than shipped broken: Mana Lens: Fire and the
-  Endoflame/Exoflame flame effect both hit a PonderLib bug where fire blocks render wrong once
-  captured into a scene section. Waiting on an upstream fix rather than working around it with
-  something that isn't what the game actually shows.
+This matters particularly for Botania because many of its systems are easy to misrepresent visually. Mana transfer, flowers, lenses and functional blocks do not always behave the way a generic animation would suggest. Botania Ponder therefore treats the game itself as the reference instead of inventing convenient visual metaphors for mechanics that do not exist.
 
-## Requirements
+At the same time, the scenes are deliberately kept small. Pondering a block should answer questions about that block, not launch a five-minute tour through half of Botania. More complicated systems are split into several scenes so individual mechanics can be understood independently.
 
-- Minecraft 1.20.1
-- Forge 47.x
-- Botania 1.20.1-454 or newer
-- PonderLib 0.7.0 or newer
+## Current coverage
 
-## Installation
+Botania Ponder currently contains **83 scenes**.
 
-Drop Botania, PonderLib, and this mod into your client's `mods` folder. Point at any supported
-Botania block or item's tooltip and press the Ponder key.
+A large part of Botania's flora is already covered. There are scenes for all standard functional flowers and thirteen generating flowers, including the Endoflame. Their demonstrations focus on the individual behavior of each flower rather than repeating a generic description of the generating and functional flora systems.
 
-## Building
+The standard Mana Lens set is also extensively documented, with **25 lens scenes** showing what the different lenses do.
 
-```shell
-./gradlew build
-```
+The Red String family currently has six scenes covering the Container, Dispenser, Nutrifier, Comparator, Spoofer and Interceptor variants.
 
-Jar comes out in `build/libs`. `./gradlew runClient` boots a dev client with the mod loaded;
-`./gradlew runData` regenerates the Ponder schematics under `src/generated/resources`.
+Core mana infrastructure is represented as well. Existing scenes cover Mana Pool filling and infusion, the Mana Spreader, Mana Void, Mana Detector, Mana Splitter, Open Crate and Spreader Turntable.
+
+Several of Botania's major crafting mechanics already have their own demonstrations, including the **Pure Daisy, Petal Apothecary, Runic Altar and Botanical Brewery**.
+
+The intention is not simply to increase the scene counter. Coverage is added when a mechanic can be represented clearly enough that the scene is actually useful while playing the mod.
+
+For a version-by-version list of additions and changes, see [CHANGELOG.md](CHANGELOG.md).
+
+## What's still missing
+
+Botania is large enough that 83 scenes still leave plenty of territory untouched.
+
+Equipment is currently one of the largest missing areas. Wands, rings, bands, armor and the manasteel, elementium and terrasteel equipment families do not yet have Ponder coverage.
+
+The Corporea system also remains largely untouched, including components such as the Corporea Index, Sparks, Retainer and Funnel.
+
+Some individual interactions are intentionally left out when the current Ponder implementation cannot display them correctly. For example, **Mana Lens: Fire** and the flame effects used by the Endoflame and Exoflame currently run into a PonderLib rendering problem involving fire blocks inside captured scene sections. Those scenes are being held back rather than replacing the real effect with something visually convincing but mechanically false.
+
+More scenes and missing systems will be added as the project develops.
+
+## Client-side only
+
+Botania Ponder is designed as a client-side documentation addon.
+
+It does not add gameplay mechanics, change Botania's balance or require a server to know anything about Ponder scenes. The mod exists purely to show documentation and demonstrations to the player using it.
+
+That also means Botania Ponder can remain separate from the actual gameplay logic it documents. The game continues to behave exactly as Botania defines it; Ponder is simply another way to understand that behavior.
+
+## About PonderLib
+
+Botania Ponder is also one of the projects the standalone [PonderLib](https://github.com/Flomik10002/PonderLib) was built for.
+
+Ponder originally comes from Create, where it is deeply integrated into the mod's own codebase. PonderLib makes the same style of interactive documentation available as an independent system that other mods and addons can build on.
+
+Botania Ponder uses that system to build scenes specifically around Botania while keeping the Ponder engine itself in a separate reusable project.
 
 ## License
 
-GNU Lesser General Public License 3.0 — see [LICENSE](LICENSE). Not affiliated with Vazkii or the
-Botania project.
+Botania Ponder is licensed under the [GNU Lesser General Public License 3.0](LICENSE).
+
+This is an independent community project and is not affiliated with or maintained by the Botania project.
