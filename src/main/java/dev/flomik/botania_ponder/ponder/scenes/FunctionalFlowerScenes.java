@@ -10,7 +10,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -22,6 +27,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import vazkii.botania.api.block_entity.FunctionalFlowerBlockEntity;
+import dev.flomik.ponderlib.api.scene.CollisionMode;
+import dev.flomik.ponderlib.api.scene.Easing;
 
 import java.util.List;
 import java.util.Objects;
@@ -232,6 +239,188 @@ public final class FunctionalFlowerScenes {
         scene.idle(8);
         finish(scene, util.select().position(flowerPos),
             "Each target takes four magic damage and costs the flower 24 Mana");
+    }
+
+    public static void dreadthorn(SceneBuilder scene, SceneBuildingUtil util) {
+        BlockPos flowerPos = util.grid().at(2, 1, 2);
+        Vec3 cowPos = util.vector().topOf(util.grid().at(1, 0, 2));
+        begin(scene, util, "dreadthorn_damage", "Protecting Young Animals with Dreadthorn",
+            flowerPos, "Dreadthorn spends Mana to damage nearby adult animals");
+
+        ElementLink<EntityElement> cow = scene.world().createEntity(level -> {
+            Cow entity = new Cow(EntityType.COW, level);
+            entity.setNoAi(true);
+            entity.moveTo(cowPos.x, cowPos.y, cowPos.z, -90, 0);
+            return entity;
+        });
+        scene.overlay().showText(58, "Adult animals inside the working range are valid targets")
+            .pointAt(cowPos.add(0, 0.8, 0))
+            .placeNearTarget()
+            .colored(PonderPalette.INPUT)
+            .attachKeyFrame();
+        scene.idle(62);
+
+        addMana(scene, flowerPos, 90);
+        for (int hit = 0; hit < 3; hit++) {
+            scene.world().modifyEntity(cow, entity -> {
+                Cow animal = (Cow) entity;
+                animal.setHealth(animal.getHealth() - 4);
+                animal.hurtTime = 10;
+                animal.hurtDuration = 10;
+            });
+            scene.world().modifyBlockEntity(flowerPos, FunctionalFlowerBlockEntity.class,
+                flower -> flower.addMana(-30));
+            scene.effects().emitParticles(cowPos.add(0, 0.8, 0),
+                scene.effects().simpleParticleEmitter(ParticleTypes.DAMAGE_INDICATOR, Vec3.ZERO), 4, 2);
+            scene.idle(12);
+        }
+        scene.effects().indicateSuccess(flowerPos);
+        scene.idle(8);
+        finish(scene, util.select().position(flowerPos),
+            "Each adult animal takes four magic damage at a cost of 30 Mana");
+    }
+
+    public static void pollidisiac(SceneBuilder scene, SceneBuildingUtil util) {
+        BlockPos flowerPos = util.grid().at(2, 1, 2);
+        Vec3 flowerCenter = util.vector().centerOf(flowerPos);
+        Vec3 cowPos = util.vector().topOf(util.grid().at(3, 0, 2));
+        Vec3 foodStart = util.vector().topOf(util.grid().at(1, 0, 2)).add(0, 0.8, 0);
+        begin(scene, util, "pollidisiac_feeding", "Feeding Animals with Pollidisiac",
+            flowerPos, "Pollidisiac uses nearby food items to feed animals automatically");
+
+        ElementLink<EntityElement> cow = scene.world().createEntity(level -> {
+            Cow entity = new Cow(EntityType.COW, level);
+            entity.setNoAi(true);
+            entity.moveTo(cowPos.x, cowPos.y, cowPos.z, 90, 0);
+            return entity;
+        });
+        ElementLink<EntityElement> wheat = scene.world().createItemEntity(
+            foodStart, Vec3.ZERO, new ItemStack(Items.WHEAT));
+        scene.overlay().showText(58, "A food item on the ground is matched to a nearby animal")
+            .pointAt(foodStart)
+            .placeNearTarget()
+            .colored(PonderPalette.INPUT)
+            .attachKeyFrame();
+        scene.idle(62);
+
+        addMana(scene, flowerPos, 12);
+        scene.world().modifyEntity(wheat, Entity::discard);
+        scene.world().modifyEntity(cow, entity -> ((Cow) entity).setInLoveTime(1200));
+        scene.world().modifyBlockEntity(flowerPos, FunctionalFlowerBlockEntity.class,
+            flower -> flower.addMana(-12));
+        scene.effects().emitParticles(cowPos.add(0, 0.9, 0),
+            scene.effects().simpleParticleEmitter(ParticleTypes.HEART, Vec3.ZERO), 8, 3);
+        scene.effects().emitSparks(flowerCenter, 0xCF6B45, 4);
+        scene.idle(20);
+        finish(scene, util.select().position(flowerPos),
+            "One matching food item and 12 Mana feed the selected animal");
+    }
+
+    public static void fallenKanade(SceneBuilder scene, SceneBuildingUtil util) {
+        BlockPos flowerPos = util.grid().at(2, 1, 2);
+        Vec3 horsePos = util.vector().topOf(util.grid().at(1, 0, 2));
+        begin(scene, util, "fallen_kanade_healing", "Healing Pets with Fallen Kanade",
+            flowerPos, "Fallen Kanade spends Mana to regenerate nearby players and tamed animals");
+
+        ElementLink<EntityElement> horse = scene.world().createEntity(level -> {
+            Horse entity = new Horse(EntityType.HORSE, level);
+            entity.setNoAi(true);
+            entity.setTamed(true);
+            entity.setHealth(entity.getMaxHealth() / 3);
+            entity.moveTo(horsePos.x, horsePos.y, horsePos.z, -90, 0);
+            return entity;
+        });
+        scene.overlay().showText(58, "An injured tamed horse inside the two-block range is selected")
+            .pointAt(horsePos.add(0, 1.2, 0))
+            .placeNearTarget()
+            .colored(PonderPalette.INPUT)
+            .attachKeyFrame();
+        scene.idle(62);
+
+        addMana(scene, flowerPos, 120);
+        scene.world().modifyEntity(horse, entity ->
+            ((Horse) entity).addEffect(new MobEffectInstance(MobEffects.REGENERATION, 59, 2, true, true)));
+        scene.world().modifyBlockEntity(flowerPos, FunctionalFlowerBlockEntity.class,
+            flower -> flower.addMana(-120));
+        for (int pulse = 0; pulse < 4; pulse++) {
+            scene.effects().emitParticles(horsePos.add(0, 1.2, 0),
+                scene.effects().simpleParticleEmitter(ParticleTypes.HEART, Vec3.ZERO), 3, 2);
+            scene.idle(15);
+        }
+        scene.effects().indicateSuccess(flowerPos);
+        scene.idle(8);
+        finish(scene, util.select().position(flowerPos),
+            "The target receives Regeneration III for 59 ticks at a cost of 120 Mana");
+    }
+
+    public static void tangleberrie(SceneBuilder scene, SceneBuildingUtil util) {
+        BlockPos flowerPos = util.grid().at(2, 1, 2);
+        Vec3 flowerCenter = util.vector().centerOf(flowerPos);
+        Vec3 inside = util.vector().topOf(util.grid().at(3, 0, 2));
+        Vec3 outsideAttempt = new Vec3(4.35, inside.y, inside.z);
+        begin(scene, util, "tangleberrie_ward", "Containing Creatures with Tangleberrie",
+            flowerPos, "Tangleberrie drains Mana to keep creatures inside a circular ward");
+
+        ElementLink<EntityElement> cow = scene.world().createEntity(level -> {
+            Cow entity = new Cow(EntityType.COW, level);
+            entity.setNoAi(true);
+            entity.moveTo(inside.x, inside.y, inside.z, -90, 0);
+            return entity;
+        });
+        scene.overlay().showText(62, "A creature trying to cross the inner boundary is pulled back")
+            .pointAt(inside.add(0, 0.8, 0))
+            .placeNearTarget()
+            .colored(PonderPalette.INPUT)
+            .attachKeyFrame();
+        addMana(scene, flowerPos, 20);
+        scene.idle(18);
+        scene.world().moveEntity(cow, outsideAttempt, 24, Easing.QUAD_IN, CollisionMode.RESPECT);
+        scene.idle(24);
+        scene.effects().emitParticles(outsideAttempt.add(0, 0.8, 0),
+            scene.effects().simpleParticleEmitter(ParticleTypes.ENCHANT, Vec3.ZERO), 8, 3);
+        scene.world().moveEntity(cow, inside, 20, Easing.QUAD_OUT, CollisionMode.RESPECT);
+        scene.idle(20);
+        scene.world().modifyBlockEntity(flowerPos, FunctionalFlowerBlockEntity.class,
+            flower -> flower.addMana(-16));
+        scene.effects().emitSparks(flowerCenter, 0x4B797C, 4);
+        scene.idle(8);
+        finish(scene, util.select().position(flowerPos),
+            "While supplied with Mana, creatures can move inside the ward but cannot leave it");
+    }
+
+    public static void jiyuulia(SceneBuilder scene, SceneBuildingUtil util) {
+        BlockPos flowerPos = util.grid().at(2, 1, 2);
+        Vec3 flowerCenter = util.vector().centerOf(flowerPos);
+        Vec3 outside = new Vec3(4.35, 1, 2.5);
+        Vec3 approach = new Vec3(3.25, 1, 2.5);
+        begin(scene, util, "jiyuulia_barrier", "Repelling Creatures with Jiyuulia",
+            flowerPos, "Jiyuulia drains Mana to keep creatures outside a circular ward");
+
+        ElementLink<EntityElement> cow = scene.world().createEntity(level -> {
+            Cow entity = new Cow(EntityType.COW, level);
+            entity.setNoAi(true);
+            entity.moveTo(outside.x, outside.y, outside.z, 90, 0);
+            return entity;
+        });
+        scene.overlay().showText(62, "A creature approaching the protected area is pushed away")
+            .pointAt(outside.add(0, 0.8, 0))
+            .placeNearTarget()
+            .colored(PonderPalette.INPUT)
+            .attachKeyFrame();
+        addMana(scene, flowerPos, 20);
+        scene.idle(18);
+        scene.world().moveEntity(cow, approach, 24, Easing.QUAD_IN, CollisionMode.RESPECT);
+        scene.idle(24);
+        scene.effects().emitParticles(approach.add(0, 0.8, 0),
+            scene.effects().simpleParticleEmitter(ParticleTypes.ENCHANT, Vec3.ZERO), 8, 3);
+        scene.world().moveEntity(cow, outside, 20, Easing.QUAD_OUT, CollisionMode.RESPECT);
+        scene.idle(20);
+        scene.world().modifyBlockEntity(flowerPos, FunctionalFlowerBlockEntity.class,
+            flower -> flower.addMana(-16));
+        scene.effects().emitSparks(flowerCenter, 0x9D7BA7, 4);
+        scene.idle(8);
+        finish(scene, util.select().position(flowerPos),
+            "While supplied with Mana, the ward prevents creatures from entering its center");
     }
 
     public static void daffomill(SceneBuilder scene, SceneBuildingUtil util) {

@@ -31,7 +31,7 @@ side = "CLIENT"
 [[dependencies."${mod_id}"]]
 modId = "ponderlib"
 mandatory = true
-versionRange = "[0.5.0,)"
+versionRange = "[0.7.0,)"
 ordering = "AFTER"
 side = "CLIENT"
 

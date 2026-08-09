@@ -166,7 +166,7 @@ dependencies {
     // (white_concrete + light_gray_concrete - see PonderSchematicProvider#withCheckerboardFloor).
     // v0.5.0 includes synchronized visible sections/BlockEntity states, fluid rendering,
     // named keyframes, navigation categories, custom elements, sounds and Ponder Doctor.
-    implementation fg.deobf('com.github.Flomik10002:PonderLib:v0.5.0-forge-1.20.1')
+    implementation fg.deobf('com.github.Flomik10002:PonderLib:v0.7.0-forge-1.20.1')
 
     // Botania - the mod this addon documents. fg.deobf() is required here for the same reason.
     // The FULL jar, not the ':api' classifier, on purpose: scenes here drive Botania's own block

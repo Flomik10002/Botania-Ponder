@@ -1,11 +1,12 @@
 package dev.flomik.botania_ponder.ponder.scenes;
 
-import dev.flomik.botania_ponder.ponder.PonderSceneUtil;
 import dev.flomik.ponderlib.api.Pointing;
 import dev.flomik.ponderlib.api.PonderPalette;
 import dev.flomik.ponderlib.api.ParticleEmitter;
 import dev.flomik.ponderlib.api.element.ElementLink;
 import dev.flomik.ponderlib.api.element.EntityElement;
+import dev.flomik.ponderlib.api.scene.CollisionMode;
+import dev.flomik.ponderlib.api.scene.Easing;
 import dev.flomik.ponderlib.api.scene.SceneBuilder;
 import dev.flomik.ponderlib.api.scene.SceneBuildingUtil;
 import net.minecraft.core.BlockPos;
@@ -79,7 +80,8 @@ public final class ManaPoolScenes {
         Vec3 dropStart = poolCenter.add(0, 1.1, 0);
         ElementLink<EntityElement> diamond = scene.world()
             .createItemEntity(dropStart, Vec3.ZERO, new ItemStack(Items.DIAMOND));
-        PonderSceneUtil.dropEntity(scene, diamond, dropStart, poolInside, 24);
+        scene.world().moveEntity(diamond, poolInside, 24, Easing.QUAD_IN, CollisionMode.IGNORE);
+        scene.idle(24);
         scene.idle(4);
 
         // Show the swap, don't just assert it: the input is removed, Botania's own sparkle plays,

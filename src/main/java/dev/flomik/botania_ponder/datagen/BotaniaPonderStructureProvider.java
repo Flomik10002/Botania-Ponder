@@ -68,11 +68,32 @@ public class BotaniaPonderStructureProvider implements DataProvider {
             bellethorn(output),
             daffomill(output),
             exoflame(output),
+            dreadthorn(output),
+            pollidisiac(output),
+            fallenKanade(output),
+            tangleberrie(output),
+            jiyuulia(output),
+            bergamute(output),
+            bubbell(output),
+            heiseiDream(output),
+            hyacidus(output),
+            labellia(output),
+            loonium(output),
+            marimorphosis(output),
+            medumone(output),
+            orechidIgnem(output),
+            rannuncarpus(output),
+            solegnolia(output),
+            spectranthemum(output),
+            tigerseye(output),
+            vinculotus(output),
+            manaLenses(output),
             manaVoid(output),
             manaDetector(output),
             manaDistributor(output),
             openCrate(output),
-            spreaderTurntable(output)
+            spreaderTurntable(output),
+            redStringBlocks(output)
         );
     }
 
@@ -325,6 +346,143 @@ public class BotaniaPonderStructureProvider implements DataProvider {
         return write(output, "functional_flora/exoflame", root(palette, blocks, 5, 2, 5));
     }
 
+    private CompletableFuture<?> dreadthorn(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/dreadthorn", "botania:dreadthorn", 2, 2);
+    }
+
+    private CompletableFuture<?> pollidisiac(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/pollidisiac", "botania:pollidisiac", 2, 2);
+    }
+
+    private CompletableFuture<?> fallenKanade(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/fallen_kanade", "botania:fallen_kanade", 2, 2);
+    }
+
+    private CompletableFuture<?> tangleberrie(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/tangleberrie", "botania:tangleberrie", 2, 2);
+    }
+
+    private CompletableFuture<?> jiyuulia(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/jiyuulia", "botania:jiyuulia", 2, 2);
+    }
+
+    private CompletableFuture<?> bergamute(CachedOutput output) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 5, (x, z) -> x == 2 && z == 2);
+        addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:bergamute"));
+        addBlock(blocks, 2, 1, 4, addPaletteEntry(palette, "minecraft:note_block"));
+        return write(output, "functional_flora/bergamute", root(palette, blocks, 5, 2, 5));
+    }
+
+    private CompletableFuture<?> bubbell(CachedOutput output) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 5, (x, z) -> x == 2 && z == 2);
+        addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:bubbell"));
+        int water = addPaletteEntry(palette, "minecraft:water", "level", "0");
+        for (int x = 1; x <= 3; x++) {
+            for (int z = 1; z <= 3; z++) {
+                if (x != 2 || z != 2) {
+                    addBlock(blocks, x, 1, z, water);
+                }
+            }
+        }
+        return write(output, "functional_flora/bubbell", root(palette, blocks, 5, 2, 5));
+    }
+
+    private CompletableFuture<?> heiseiDream(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/heisei_dream", "botania:heisei_dream", 2, 2);
+    }
+
+    private CompletableFuture<?> hyacidus(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/hyacidus", "botania:hyacidus", 2, 2);
+    }
+
+    private CompletableFuture<?> labellia(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/labellia", "botania:labellia", 2, 2);
+    }
+
+    private CompletableFuture<?> loonium(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/loonium", "botania:loonium", 2, 2);
+    }
+
+    private CompletableFuture<?> marimorphosis(CachedOutput output) {
+        return flowerWithInputRow(output, "functional_flora/marimorphosis",
+            "botania:marimorphosis", "minecraft:stone");
+    }
+
+    private CompletableFuture<?> medumone(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/medumone", "botania:medumone", 2, 2);
+    }
+
+    private CompletableFuture<?> orechidIgnem(CachedOutput output) {
+        return flowerWithInputRow(output, "functional_flora/orechid_ignem",
+            "botania:orechid_ignem", "minecraft:netherrack");
+    }
+
+    private CompletableFuture<?> rannuncarpus(CachedOutput output) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 5);
+        int grass = addPaletteEntry(palette, "minecraft:grass_block");
+        int whiteConcrete = addPaletteEntry(palette, "minecraft:white_concrete");
+        addBlock(blocks, 2, 1, 2, grass);
+        addBlock(blocks, 3, 1, 2, whiteConcrete);
+        addBlock(blocks, 2, 2, 2, addPaletteEntry(palette, "botania:rannuncarpus"));
+        return write(output, "functional_flora/rannuncarpus", root(palette, blocks, 5, 3, 5));
+    }
+
+    private CompletableFuture<?> solegnolia(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/solegnolia", "botania:solegnolia", 2, 2);
+    }
+
+    private CompletableFuture<?> spectranthemum(CachedOutput output) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 5, (x, z) -> x == 1 && z == 2);
+        addBlock(blocks, 1, 1, 2, addPaletteEntry(palette, "botania:spectranthemum"));
+        addBlock(blocks, 4, 1, 2, addPaletteEntry(palette, "minecraft:gold_block"));
+        return write(output, "functional_flora/spectranthemum", root(palette, blocks, 5, 2, 5));
+    }
+
+    private CompletableFuture<?> tigerseye(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/tigerseye", "botania:tigerseye", 2, 2);
+    }
+
+    private CompletableFuture<?> vinculotus(CachedOutput output) {
+        return solitaryFlower(output, "functional_flora/vinculotus", "botania:vinculotus", 2, 2);
+    }
+
+    private CompletableFuture<?> manaLenses(CachedOutput output) {
+        String[] paths = {
+            "normal", "speed", "power", "time", "efficiency", "bounce", "gravity", "mine",
+            "damage", "phantom", "magnet", "explosive", "influence", "weight", "paint", "fire",
+            "piston", "light", "warp", "redirect", "firework", "flare", "messenger", "tripwire", "storm"
+        };
+        return CompletableFuture.allOf(java.util.Arrays.stream(paths)
+            .map(path -> manaLens(output, path))
+            .toArray(CompletableFuture[]::new));
+    }
+
+    private CompletableFuture<?> manaLens(CachedOutput output, String path) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 5);
+        addBlock(blocks, 2, 1, 0, addPaletteEntry(palette, "botania:mana_spreader"));
+        String target = switch (path) {
+            case "normal", "speed", "power", "time", "efficiency", "magnet", "messenger" -> "botania:mana_pool";
+            case "paint" -> "minecraft:white_wool";
+            case "fire" -> "minecraft:netherrack";
+            case "warp" -> "botania:piston_relay";
+            case "redirect" -> "botania:mana_spreader";
+            default -> "minecraft:stone";
+        };
+        int targetZ = path.equals("piston") ? 3 : 4;
+        addBlock(blocks, 2, 1, targetZ, addPaletteEntry(palette, target));
+        return write(output, "mana_lenses/" + path, root(palette, blocks, 5, 4, 5));
+    }
+
     private CompletableFuture<?> manaVoid(CachedOutput output) {
         ListTag palette = new ListTag();
         ListTag blocks = new ListTag();
@@ -372,6 +530,71 @@ public class BotaniaPonderStructureProvider implements DataProvider {
         addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:turntable"));
         addBlock(blocks, 2, 2, 2, addPaletteEntry(palette, "botania:mana_spreader"));
         return write(output, "mana_devices/spreader_turntable", root(palette, blocks, 5, 3, 5));
+    }
+
+    private CompletableFuture<?> redStringBlocks(CachedOutput output) {
+        return CompletableFuture.allOf(
+            redStringBlock(output, "container"),
+            redStringBlock(output, "dispenser"),
+            redStringBlock(output, "nutrifier"),
+            redStringBlock(output, "comparator"),
+            redStringBlock(output, "relay"),
+            redStringBlock(output, "interceptor")
+        );
+    }
+
+    /** Six related blocks sharing the same south-facing, four-block Red String link. */
+    private CompletableFuture<?> redStringBlock(CachedOutput output, String path) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        BiPredicate<Integer, Integer> grass = path.equals("relay")
+            ? (x, z) -> (x == 3 && z == 5) || (x == 2 && z == 5) || (x == 4 && z == 5)
+                || (x == 3 && z == 4) || (x == 3 && z == 6)
+            : (x, z) -> false;
+        BiPredicate<Integer, Integer> farmland = path.equals("nutrifier")
+            ? (x, z) -> x == 3 && z == 5
+            : (x, z) -> false;
+        checkerboardFloor(palette, blocks, 7, grass, farmland);
+
+        String sourceId = switch (path) {
+            case "container" -> "botania:red_string_container";
+            case "dispenser" -> "botania:red_string_dispenser";
+            case "nutrifier" -> "botania:red_string_fertilizer";
+            case "comparator" -> "botania:red_string_comparator";
+            case "relay" -> "botania:red_string_relay";
+            case "interceptor" -> "botania:red_string_interceptor";
+            default -> throw new IllegalArgumentException("Unknown Red String scene: " + path);
+        };
+        addBlock(blocks, 3, 1, 1, addPaletteEntry(palette, sourceId, "facing", "south"));
+
+        String targetId = switch (path) {
+            case "dispenser" -> "minecraft:dispenser";
+            case "nutrifier" -> "minecraft:wheat";
+            case "relay" -> "minecraft:dandelion";
+            default -> "minecraft:chest";
+        };
+        int target = path.equals("dispenser")
+            ? addPaletteEntry(palette, targetId, "facing", "south")
+            : addPaletteEntry(palette, targetId);
+        addBlock(blocks, 3, 1, 5, target);
+
+        switch (path) {
+            case "container" -> addBlock(blocks, 2, 1, 1,
+                addPaletteEntry(palette, "minecraft:hopper", "facing", "east"));
+            case "comparator" -> {
+                addBlock(blocks, 2, 1, 1,
+                    addPaletteEntry(palette, "minecraft:comparator", "facing", "west"));
+                addBlock(blocks, 1, 1, 1, addPaletteEntry(palette, "minecraft:redstone_lamp"));
+            }
+            case "relay" -> addBlock(blocks, 3, 2, 1,
+                addPaletteEntry(palette, "botania:jaded_amaranthus"));
+            case "interceptor" -> addBlock(blocks, 2, 1, 1,
+                addPaletteEntry(palette, "minecraft:redstone_lamp"));
+            default -> {
+            }
+        }
+
+        return write(output, "red_string/" + path, root(palette, blocks, 7, 3, 7));
     }
 
     private static CompoundTag root(ListTag palette, ListTag blocks, int sx, int sy, int sz) {
