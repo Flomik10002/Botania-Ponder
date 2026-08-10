@@ -2,6 +2,11 @@
 #
 # publish-curseforge.sh — publish the latest (or a chosen) git tag to CurseForge.
 #
+# The jar is never built or searched for locally — it's downloaded from the
+# GitHub Release that matches the tag (attach the build artifact to the
+# release first, e.g. via `gh release upload <tag> <jar>`). The GitHub
+# release is the single source of truth for both the artifact and its tag.
+#
 # Portable: drop this file plus a "curseforge.publish.conf" into the root of
 # any Gradle mod project and it will work, as long as the config is filled in.
 #
@@ -10,7 +15,7 @@
 # passed, so re-running it after a mistake never spams the CurseForge page
 # with duplicate files.
 #
-# Requires: bash 4+, curl, jq, git.
+# Requires: bash 4+, curl, jq, git, gh (authenticated: `gh auth status`).
 # Auth: set CURSEFORGE_API_TOKEN in your environment, or put it in a
 #       ".env.curseforge" file (gitignored) next to the config — never commit
 #       the token itself.
@@ -23,19 +28,22 @@ set -euo pipefail
 
 CF_PROJECT_ID=""
 CF_PROJECT_SLUG=""
+CF_GITHUB_REPO=""   # empty = auto-detect "owner/repo" from the 'origin' git remote
 CF_MC_VERSIONS=""   # empty = auto-detect from gradle.properties (minecraft_version)
 CF_MOD_LOADERS=""   # empty = auto-detect from build.gradle plugin ids
 CF_JAVA_VERSIONS=""
 CF_RELEASE_TYPE="release"
 CF_TAG_PREFIX="v"
-CF_JAR_GLOB="build/libs/*{version}*.jar"
-CF_JAR_EXCLUDE_PATTERN="-(sources|dev|shadow|api)\.jar$"
+CF_JAR_EXCLUDE_PATTERN="-(sources|dev|shadow|api)\.jar$"   # release assets to ignore when picking the jar
 CF_CHANGELOG_FILE="CHANGELOG.md"
 CF_CHANGELOG_TYPE="markdown"
 CF_DISPLAY_NAME_TEMPLATE="{mod_name} {version}"
 CF_MOD_NAME=""
-CF_BUILD_COMMAND=""
 CF_STATE_FILE=".curseforge-published.json"
+
+CLEANUP_PATHS=()
+cleanup() { local p; for p in "${CLEANUP_PATHS[@]:-}"; do [[ -n "$p" ]] && rm -rf "$p"; done; }
+trap cleanup EXIT
 
 DRY_RUN=0
 ASSUME_YES=0
@@ -114,7 +122,7 @@ done
 # Dependencies
 # ---------------------------------------------------------------------------
 
-for bin in git curl jq; do
+for bin in git curl jq gh; do
   command -v "$bin" >/dev/null 2>&1 || die "'$bin' is required but not installed."
 done
 
@@ -205,6 +213,13 @@ if [[ -z "$CF_MOD_LOADERS" ]]; then
   info "Auto-detected mod loader(s): $CF_MOD_LOADERS (from build.gradle)"
 fi
 
+if [[ -z "$CF_GITHUB_REPO" ]]; then
+  ORIGIN_URL="$(git -C "$REPO_ROOT" remote get-url origin 2>/dev/null || true)"
+  CF_GITHUB_REPO="$(printf '%s' "$ORIGIN_URL" | sed -E 's#^(git@github\.com:|https://github\.com/)##; s#\.git$##')"
+  [[ -n "$CF_GITHUB_REPO" ]] || die "Could not auto-detect the GitHub repo from the 'origin' remote. Set CF_GITHUB_REPO in $CONFIG_PATH."
+  info "Auto-detected GitHub repo: $CF_GITHUB_REPO (from git remote)"
+fi
+
 # ---------------------------------------------------------------------------
 # Resolve the target tag
 # ---------------------------------------------------------------------------
@@ -243,48 +258,40 @@ if [[ -n "$PREVIOUS_FILE_ID" && "$FORCE" -ne 1 ]]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Optional build step
+# Fetch the build artifact from the matching GitHub Release
 # ---------------------------------------------------------------------------
 
-if [[ -n "$CF_BUILD_COMMAND" ]]; then
-  info "Running build command: $CF_BUILD_COMMAND"
-  if [[ "$DRY_RUN" -eq 1 ]]; then
-    log "  (skipped, --dry-run)"
-  else
-    (cd "$REPO_ROOT" && eval "$CF_BUILD_COMMAND")
+info "Looking up GitHub release '$TARGET_TAG' in $CF_GITHUB_REPO..."
+ASSET_NAMES="$(gh release view "$TARGET_TAG" --repo "$CF_GITHUB_REPO" --json assets --jq '.assets[].name' 2>&1)" \
+  || die "No GitHub release found for tag '$TARGET_TAG' in $CF_GITHUB_REPO. Create it first (gh release create $TARGET_TAG)."
+
+CANDIDATES=()
+while IFS= read -r name; do
+  [[ -z "$name" ]] && continue
+  [[ "$name" == *.jar ]] || continue
+  if [[ -n "$CF_JAR_EXCLUDE_PATTERN" && "$name" =~ $CF_JAR_EXCLUDE_PATTERN ]]; then
+    continue
   fi
+  CANDIDATES+=("$name")
+done <<<"$ASSET_NAMES"
+
+if [[ ${#CANDIDATES[@]} -eq 0 ]]; then
+  die "Release '$TARGET_TAG' has no .jar asset attached. Attach the build first: gh release upload $TARGET_TAG <path-to-jar> --repo $CF_GITHUB_REPO"
+elif [[ ${#CANDIDATES[@]} -gt 1 ]]; then
+  warn "Multiple .jar assets on release '$TARGET_TAG':"
+  printf '  %s\n' "${CANDIDATES[@]}" >&2
+  die "Narrow CF_JAR_EXCLUDE_PATTERN so exactly one asset matches."
 fi
 
-# ---------------------------------------------------------------------------
-# Locate the jar
-# ---------------------------------------------------------------------------
+JAR_NAME="${CANDIDATES[0]}"
+DOWNLOAD_DIR="$(mktemp -d)"
+CLEANUP_PATHS+=("$DOWNLOAD_DIR")
 
-GLOB_PATTERN="${CF_JAR_GLOB//\{version\}/$VERSION}"
-GLOB_PATTERN="${GLOB_PATTERN//\{tag\}/$TARGET_TAG}"
+gh release download "$TARGET_TAG" --repo "$CF_GITHUB_REPO" --pattern "$JAR_NAME" --dir "$DOWNLOAD_DIR" --clobber \
+  || die "Failed to download '$JAR_NAME' from the GitHub release."
 
-shopt -s nullglob
-MATCHES=( "$REPO_ROOT"/$GLOB_PATTERN )
-shopt -u nullglob
-
-if [[ -n "$CF_JAR_EXCLUDE_PATTERN" ]]; then
-  FILTERED=()
-  for f in "${MATCHES[@]}"; do
-    [[ "$f" =~ $CF_JAR_EXCLUDE_PATTERN ]] || FILTERED+=("$f")
-  done
-  MATCHES=( "${FILTERED[@]}" )
-fi
-
-if [[ ${#MATCHES[@]} -eq 0 ]]; then
-  die "No jar matched pattern '$GLOB_PATTERN'. Build the project first, or fix CF_JAR_GLOB in $CONFIG_PATH."
-elif [[ ${#MATCHES[@]} -gt 1 ]]; then
-  warn "Multiple jars matched '$GLOB_PATTERN':"
-  printf '  %s\n' "${MATCHES[@]}" >&2
-  die "Narrow CF_JAR_GLOB so it matches exactly one file."
-fi
-
-JAR_PATH="${MATCHES[0]}"
-JAR_NAME="$(basename "$JAR_PATH")"
-info "Artifact: $JAR_NAME ($(du -h "$JAR_PATH" | cut -f1))"
+JAR_PATH="$DOWNLOAD_DIR/$JAR_NAME"
+info "Artifact: $JAR_NAME ($(du -h "$JAR_PATH" | cut -f1)) — from GitHub release $TARGET_TAG"
 
 # ---------------------------------------------------------------------------
 # Build the changelog for this version
@@ -329,6 +336,7 @@ DISPLAY_NAME="${DISPLAY_NAME//\{tag\}/$TARGET_TAG}"
 # ---------------------------------------------------------------------------
 
 info "${C_BOLD}About to publish:${C_RESET}"
+log "  GitHub repo     : $CF_GITHUB_REPO"
 log "  Project ID     : $CF_PROJECT_ID"
 log "  Tag             : $TARGET_TAG"
 log "  Display name    : $DISPLAY_NAME"
@@ -389,7 +397,7 @@ METADATA_JSON="$(jq -n \
 info "Uploading $JAR_NAME to CurseForge project $CF_PROJECT_ID..."
 
 HTTP_RESPONSE_FILE="$(mktemp)"
-trap 'rm -f "$HTTP_RESPONSE_FILE"' EXIT
+CLEANUP_PATHS+=("$HTTP_RESPONSE_FILE")
 
 HTTP_STATUS="$(curl -s -o "$HTTP_RESPONSE_FILE" -w '%{http_code}' \
   -H "X-Api-Token: $CURSEFORGE_API_TOKEN" \

@@ -13,6 +13,11 @@ CF_PROJECT_ID=""
 # Optional. Used only to print a direct link to the uploaded file.
 CF_PROJECT_SLUG=""
 
+# "owner/repo" on GitHub. Leave empty to auto-detect from the 'origin' remote.
+# The jar is always pulled from this repo's GitHub Release for the tag being
+# published — attach it first with: gh release upload <tag> <path-to-jar>
+CF_GITHUB_REPO=""
+
 # Space-separated CurseForge game-version names this file supports.
 # Leave empty to auto-detect from gradle.properties' minecraft_version.
 # Must match names from https://minecraft.curseforge.com/api/game/versions
@@ -35,13 +40,9 @@ CF_RELEASE_TYPE="release"
 # Prefix stripped from the git tag to get the mod version (v1.2.3 -> 1.2.3).
 CF_TAG_PREFIX="v"
 
-# Glob (relative to the repo root) used to find the build artifact.
-# {version} and {tag} are substituted before matching. Must match exactly
-# one file — narrow it down if your build produces several jars.
-CF_JAR_GLOB="build/libs/*{version}*.jar"
-
-# Extended-regex filenames to exclude from CF_JAR_GLOB matches (sources/dev
-# jars etc.). Leave empty to disable filtering.
+# Extended-regex asset filenames to ignore when picking the jar off the
+# GitHub Release (sources/dev builds etc, if you attach more than one asset).
+# Leave empty to disable filtering.
 CF_JAR_EXCLUDE_PATTERN="-(sources|dev|shadow|api)\.jar$"
 
 # Where to pull the per-version changelog text from. The script looks for a
@@ -57,10 +58,6 @@ CF_DISPLAY_NAME_TEMPLATE="{mod_name} {version}"
 # Leave empty to auto-detect from gradle.properties' mod_name, falling back
 # to the repo directory name.
 CF_MOD_NAME=""
-
-# Optional shell command run (from the repo root) before locating the jar,
-# e.g. "./gradlew build". Leave empty to skip and use an already-built jar.
-CF_BUILD_COMMAND=""
 
 # Where to remember which tags were already published (repo-root relative).
 # Keyed by CF_PROJECT_ID, so one state file is safe to reuse across configs.
