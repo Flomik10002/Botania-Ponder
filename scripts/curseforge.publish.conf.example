@@ -14,25 +14,34 @@ CF_PROJECT_ID=""
 CF_PROJECT_SLUG=""
 
 # "owner/repo" on GitHub. Leave empty to auto-detect from the 'origin' remote.
-# The jar is always pulled from this repo's GitHub Release for the tag being
+# The jar is always pulled from this repo's GitHub Release for each tag being
 # published — attach it first with: gh release upload <tag> <path-to-jar>
 CF_GITHUB_REPO=""
 
-# Space-separated CurseForge game-version names this file supports.
-# Leave empty to auto-detect from gradle.properties' minecraft_version.
-# Must match names from https://minecraft.curseforge.com/api/game/versions
-# exactly (the script will tell you close matches if you get it wrong).
-# Only set this manually if you support more MC versions than the one you
-# build against, or gradle.properties doesn't have minecraft_version=.
+# Space-separated CurseForge game-version names this file supports, sent as
+# gameVersionNames. Leave empty to auto-detect PER TAG from that tag's own
+# gradle.properties (read via `git show <tag>:gradle.properties`, not from
+# the working tree) — so publishing a release with several loader/branch
+# tags at once still gets each file's correct MC version. Only set this
+# manually to force the same value for every tag in a run.
 CF_MC_VERSIONS=""
 
 # Space-separated mod loader names, e.g. "Forge", "Fabric", "NeoForge", "Quilt".
-# Leave empty to auto-detect from the plugin ids in build.gradle
-# (net.minecraftforge.gradle / fabric-loom / net.neoforged / org.quiltmc.loom).
+# Leave empty to auto-detect PER TAG from that tag's own build.gradle
+# (net.minecraftforge.gradle / fabric-loom / net.neoforged / org.quiltmc.loom),
+# same tag-content sourcing as CF_MC_VERSIONS above. Only set this manually
+# to force the same value for every tag in a run.
 CF_MOD_LOADERS=""
 
-# Optional extra game-version entries, e.g. "Java 17".
-CF_JAVA_VERSIONS=""
+# Required. CurseForge's "Environment" tag(s) — separate from game version
+# and mod loader, but still mandatory or the upload is rejected with
+# errorCode 1021. Use "Client" for a client-side-only mod, "Server" for a
+# server-side-only mod, or "Client Server" (space-separated, both tags) if
+# it's needed on both sides.
+CF_ENVIRONMENTS=""
+
+# Optional extra names to add to gameVersionNames, e.g. "Java 17".
+CF_EXTRA_VERSIONS=""
 
 # release | beta | alpha. Can be overridden per run with --release-type.
 CF_RELEASE_TYPE="release"
@@ -53,7 +62,7 @@ CF_CHANGELOG_TYPE="markdown"
 
 # Template for the file's display name on CurseForge.
 # Placeholders: {mod_name} {version} {tag}
-CF_DISPLAY_NAME_TEMPLATE="{mod_name} {version}"
+CF_DISPLAY_NAME_TEMPLATE="{mod_name}-{version}"
 
 # Leave empty to auto-detect from gradle.properties' mod_name, falling back
 # to the repo directory name.
