@@ -151,7 +151,7 @@ info "Using config: $CONFIG_PATH"
 source "$CONFIG_PATH"
 
 for envfile in "$REPO_ROOT/.env.curseforge" "$SCRIPT_DIR/.env.curseforge"; do
-  if [[ -f "$envfile" ]]; then
+  if [[ -z "${CURSEFORGE_API_TOKEN:-}" && -f "$envfile" ]]; then
     # shellcheck source=/dev/null
     source "$envfile"
     break
