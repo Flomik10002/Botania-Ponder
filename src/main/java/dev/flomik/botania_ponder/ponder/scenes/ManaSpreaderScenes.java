@@ -63,7 +63,9 @@ public final class ManaSpreaderScenes {
                 "Generating Flora placed nearby auto-bind to the closest Spreader and feed it as they work")
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(95);
+        // 105, not 95: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 90-tick text needs at least 100 before fillSpreader()'s own text opens.
+        scene.idle(105);
         fillSpreader(scene, spreaderPos, spreaderCenter, flowerPositions);
         scene.idle(10);
 
@@ -75,7 +77,9 @@ public final class ManaSpreaderScenes {
                 "The stored Mana is fired in bursts at the block the Spreader is bound to")
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(75);
+        // 85, not 75: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 70-tick text needs at least 80 before the next one opens without overlapping it.
+        scene.idle(85);
 
         scene.overlay().showText(100,
                 "With a Wand of the Forest in Bind Mode, sneak-right click the Spreader, then its target")
@@ -93,7 +97,9 @@ public final class ManaSpreaderScenes {
         scene.idle(45);
         scene.overlay().showOutline(PonderPalette.OUTPUT, "binding_target",
             util.select().position(targetPos), 30);
-        scene.idle(40);
+        // 50, not 40: keeps the "sneak-right click" text's window (100-tick text, fading out 5
+        // ticks past that) from overlapping the "aiming beam" text's below.
+        scene.idle(50);
 
         // Holding the wand makes a bound Spreader draw its aiming beam - real behaviour, see
         // botania.page.spreader3 ("nearby spreaders display aiming beams").
@@ -102,7 +108,9 @@ public final class ManaSpreaderScenes {
             .pointAt(spreaderCenter)
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(65);
+        // 75, not 65: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 60-tick text needs at least 70 before the next one opens without overlapping it.
+        scene.idle(75);
 
         scene.overlay().showText(70, "It then keeps firing as long as it has Mana and its target can accept more")
             .pointAt(spreaderCenter)
@@ -149,7 +157,8 @@ public final class ManaSpreaderScenes {
             });
             scene.idle(1);
         }
-        scene.idle(5);
+        // 15, not 5: keeps the "flows into the buffer" text's window from overlapping this one's.
+        scene.idle(15);
         scene.effects().indicateSuccess(spreaderPos);
         scene.overlay().showText(28, "The Mana buffer is full")
             .pointAt(spreaderCenter)

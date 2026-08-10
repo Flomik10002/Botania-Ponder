@@ -65,7 +65,9 @@ public final class PetalApothecaryScenes {
             .placeNearTarget()
             .colored(PonderPalette.INPUT)
             .attachKeyFrame();
-        scene.idle(60);
+        // 70, not 60: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 55-tick text needs at least 65 before the next one opens without overlapping it.
+        scene.idle(70);
 
         List<ItemStack> petals = List.of(
             botaniaItem("brown_petal"),

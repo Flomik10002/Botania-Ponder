@@ -51,7 +51,9 @@ public final class RunicAltarScenes {
                 "The Runic Altar combines items and Mana to create Runes")
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(75);
+        // 85, not 75: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 70-tick text needs at least 80 before the next one opens without overlapping it.
+        scene.idle(85);
 
         List<ItemStack> ingredients = List.of(
             botaniaItem("mana_powder", 1),

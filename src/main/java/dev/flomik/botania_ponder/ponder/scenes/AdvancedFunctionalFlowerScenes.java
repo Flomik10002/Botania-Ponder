@@ -160,7 +160,9 @@ public final class AdvancedFunctionalFlowerScenes {
         ElementLink<EntityElement> droppedTag = scene.world().createItemEntity(tagPos, Vec3.ZERO, tag);
         scene.overlay().showText(55, "The custom name is read from the dropped Name Tag")
             .pointAt(tagPos).placeNearTarget().colored(PonderPalette.INPUT).attachKeyFrame();
-        scene.idle(60);
+        // 70, not 60: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 55-tick text needs at least 65 before the next one opens without overlapping it.
+        scene.idle(70);
 
         addMana(scene, flowerPos, 500);
         scene.world().modifyEntity(droppedTag, Entity::discard);
@@ -175,7 +177,8 @@ public final class AdvancedFunctionalFlowerScenes {
             .placeNearTarget()
             .colored(PonderPalette.OUTPUT)
             .attachKeyFrame();
-        scene.idle(60);
+        // 70, not 60: same fade-padding margin as above, ahead of finish()'s own text window.
+        scene.idle(70);
         finish(scene, util.select().position(flowerPos),
             "The tag is consumed and nearby creatures receive its name for 500 Mana");
     }
@@ -371,7 +374,10 @@ public final class AdvancedFunctionalFlowerScenes {
         scene.world().modifyEntity(creeper, entity -> ((Creeper) entity).setSwellDir(1));
         scene.effects().emitParticles(creeperPos.add(0, 0.8, 0),
             scene.effects().simpleParticleEmitter(ParticleTypes.SMOKE, Vec3.ZERO), 5, 2);
-        scene.idle(12);
+        // 40, not 12: keeps this text's window from overlapping finish()'s (the idle(30) right
+        // before moveEntity is fixed to that call's own travel duration, so it can't absorb this;
+        // text windows also fade in/out 5 ticks past their declared duration on each side).
+        scene.idle(40);
 
         addMana(scene, flowerPos, 70);
         scene.world().modifyEntity(creeper, entity -> ((Creeper) entity).setSwellDir(-1));
@@ -429,7 +435,11 @@ public final class AdvancedFunctionalFlowerScenes {
         scene.idle(10);
         scene.overlay().showOutlineWithText(util.select().position(flowerPos), 65, description)
             .placeNearTarget().attachKeyFrame();
-        scene.idle(70);
+        // 80, not 70: PonderLib's text windows fade in/out over 5 ticks each on top of their
+        // declared duration (see TextInstruction/FadeInOutInstruction), so a 65-tick text is
+        // actually on screen for 75 ticks - 80 leaves a small margin past that instead of landing
+        // the scene's own first text exactly on the boundary (still visibly overlaps in-game).
+        scene.idle(80);
     }
 
     private static void revealRow(SceneBuilder scene, SceneBuildingUtil util, Vec3 focus, int z) {

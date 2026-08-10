@@ -77,7 +77,8 @@ public final class EndoflameScenes {
         }
 
         scene.effects().indicateSuccess(flowerPos);
-        scene.idle(10);
+
+        scene.idle(15);
         scene.overlay().showOutlineWithText(util.select().position(flowerPos), 65,
                 "While the fuel burns, the Endoflame steadily fills its internal Mana buffer")
             .placeNearTarget()

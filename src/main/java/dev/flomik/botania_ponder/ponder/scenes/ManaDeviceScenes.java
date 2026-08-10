@@ -141,7 +141,8 @@ public final class ManaDeviceScenes {
             .attachKeyFrame();
         scene.idle(54);
         scene.effects().indicateSuccess(cratePos);
-        scene.idle(8);
+        // 18, not 8: keeps this text's window from overlapping finish()'s.
+        scene.idle(18);
         finish(scene, util.select().position(cratePos),
             "The item leaves directly below the Crate with no horizontal movement");
     }
@@ -160,7 +161,9 @@ public final class ManaDeviceScenes {
                 "The Spreader's aim sweeps around while the Turntable runs")
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(65);
+        // 75, not 65: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 60-tick text needs at least 70 before the next one opens without overlapping it.
+        scene.idle(75);
 
         scene.overlay().showText(60, "Rotation is continuous and changes the direction of future bursts")
             .pointAt(turntableCenter)
@@ -190,7 +193,10 @@ public final class ManaDeviceScenes {
         scene.overlay().showOutlineWithText(util.select().position(subjectPos), 65, description)
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(70);
+        // 80, not 70: text windows fade in/out over 5 ticks each beyond their declared duration
+        // (TextInstruction/FadeInOutInstruction), so a 65-tick text is on screen for 75 ticks - 80
+        // leaves a small margin past that instead of landing the scene's first text on the boundary.
+        scene.idle(80);
     }
 
     private static void distributeMana(SceneBuilder scene, SceneBuildingUtil util,

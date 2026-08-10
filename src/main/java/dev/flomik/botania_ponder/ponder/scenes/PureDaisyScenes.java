@@ -67,7 +67,9 @@ public final class PureDaisyScenes {
                 "Logs and Stone can fill all eight spaces around the Daisy")
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(80);
+        // 90, not 80: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 75-tick text needs at least 85 before the next one opens without overlapping it.
+        scene.idle(90);
 
         scene.overlay().showText(48, "Leave the blocks in place while the Daisy works")
             .pointAt(daisyCenter)

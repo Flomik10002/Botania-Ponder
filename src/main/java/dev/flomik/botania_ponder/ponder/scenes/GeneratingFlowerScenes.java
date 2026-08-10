@@ -56,7 +56,9 @@ public final class GeneratingFlowerScenes {
             .placeNearTarget()
             .colored(PonderPalette.INPUT)
             .attachKeyFrame();
-        scene.idle(60);
+        // 70, not 60: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 55-tick text needs at least 65 before absorbFluid()'s own text opens.
+        scene.idle(70);
 
         absorbFluid(scene, util, waterPos, flowerCenter,
             "The flower detects the source and slowly draws the water into itself", 0x536FBD);
@@ -83,7 +85,9 @@ public final class GeneratingFlowerScenes {
             .placeNearTarget()
             .colored(PonderPalette.INPUT)
             .attachKeyFrame();
-        scene.idle(60);
+        // 70, not 60: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 55-tick text needs at least 65 before absorbFluid()'s own text opens.
+        scene.idle(70);
 
         absorbFluid(scene, util, lavaPos, flowerCenter,
             "The Thermalily absorbs the source before it begins generating Mana", 0xC55A32);
@@ -376,7 +380,9 @@ public final class GeneratingFlowerScenes {
         generateMana(scene, flowerPos, flowerCenter, 240, 28, 0x8B487C);
         scene.idle(4);
         scene.effects().indicateSuccess(flowerPos);
-        scene.idle(8);
+        // 16, not 8: keeps this text's window (60-tick text, fading out 5 ticks past that) from
+        // overlapping finish()'s.
+        scene.idle(16);
         finish(scene, util.select().position(flowerPos),
             "Mana gained equals the consumed cell's generation multiplied by 60");
     }
@@ -480,7 +486,10 @@ public final class GeneratingFlowerScenes {
         scene.overlay().showOutlineWithText(util.select().position(flowerPos), 65, description)
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(70);
+        // 80, not 70: text windows fade in/out over 5 ticks each beyond their declared duration
+        // (TextInstruction/FadeInOutInstruction), so a 65-tick text is on screen for 75 ticks - 80
+        // leaves a small margin past that instead of landing the scene's first text on the boundary.
+        scene.idle(80);
     }
 
     private static void finish(SceneBuilder scene, Selection flower, String text) {

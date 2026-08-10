@@ -159,7 +159,9 @@ public final class FunctionalFlowerScenes {
             scene.idle(18);
         }
         scene.effects().indicateSuccess(flowerPos);
-        scene.idle(8);
+        // 25, not 8: keeps the intro text's window (66-tick text, fading out 5 ticks past that)
+        // from overlapping finish()'s.
+        scene.idle(25);
         Selection grown = util.select().position(growthPositions.get(0))
             .add(util.select().position(growthPositions.get(1)))
             .add(util.select().position(growthPositions.get(2)));
@@ -180,7 +182,9 @@ public final class FunctionalFlowerScenes {
                 "Place an inventory directly beside the flower")
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(60);
+        // 70, not 60: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 55-tick text needs at least 65 before the next one opens without overlapping it.
+        scene.idle(70);
 
         ItemStack item = new ItemStack(Items.DIAMOND);
         Vec3 itemStart = flowerCenter.add(-1.5, 0.8, 0);
@@ -196,7 +200,8 @@ public final class FunctionalFlowerScenes {
         scene.world().modifyBlockEntity(chestPos, ChestBlockEntity.class,
             chest -> chest.setItem(0, item.copy()));
         scene.effects().indicateSuccess(chestPos);
-        scene.idle(8);
+        // 15, not 8: keeps the previous text's window from overlapping finish()'s.
+        scene.idle(15);
         finish(scene, util.select().position(chestPos),
             "The item is inserted into the adjacent inventory automatically");
     }
@@ -383,7 +388,8 @@ public final class FunctionalFlowerScenes {
         scene.world().modifyBlockEntity(flowerPos, FunctionalFlowerBlockEntity.class,
             flower -> flower.addMana(-16));
         scene.effects().emitSparks(flowerCenter, 0x4B797C, 4);
-        scene.idle(8);
+        // 15, not 8: keeps the intro text's window from overlapping finish()'s.
+        scene.idle(15);
         finish(scene, util.select().position(flowerPos),
             "While supplied with Mana, creatures can move inside the ward but cannot leave it");
     }
@@ -418,7 +424,8 @@ public final class FunctionalFlowerScenes {
         scene.world().modifyBlockEntity(flowerPos, FunctionalFlowerBlockEntity.class,
             flower -> flower.addMana(-16));
         scene.effects().emitSparks(flowerCenter, 0x9D7BA7, 4);
-        scene.idle(8);
+        // 15, not 8: keeps the intro text's window from overlapping finish()'s.
+        scene.idle(15);
         finish(scene, util.select().position(flowerPos),
             "While supplied with Mana, the ward prevents creatures from entering its center");
     }
@@ -516,7 +523,10 @@ public final class FunctionalFlowerScenes {
         scene.overlay().showOutlineWithText(util.select().position(flowerPos), 65, description)
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(70);
+        // 80, not 70: text windows fade in/out over 5 ticks each beyond their declared duration
+        // (TextInstruction/FadeInOutInstruction), so a 65-tick text is on screen for 75 ticks - 80
+        // leaves a small margin past that instead of landing the scene's first text on the boundary.
+        scene.idle(80);
     }
 
     private static void revealRow(SceneBuilder scene, SceneBuildingUtil util, Vec3 focus, int z) {

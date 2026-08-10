@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 1.1.1 — 2026-08-10
+
+- Updated to PonderLib 0.7.2 (idle() timeline-blocking fix, hold-to-ponder localisation, scene
+  info plaque, and a production-Forge SchematicLoader crash fix).
+- Fixed text windows overlapping the next instruction across the Functional Flora, Generating
+  Flora, Mana Spreader, Mana Device, Endoflame, Pure Daisy, Petal Apothecary, Runic Altar,
+  Botanical Brewery, and Red String scenes: PonderLib fades text in/out over 5 ticks beyond its
+  declared duration, so `idle()` calls right before the next text window needed a matching margin.
+
 ## 1.1.0 — 2026-08-09
 
 - Completed the standard Functional Flora chapter with focused scenes for Bergamute, Bubbell,

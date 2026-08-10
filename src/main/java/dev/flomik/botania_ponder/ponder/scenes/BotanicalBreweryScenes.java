@@ -54,7 +54,9 @@ public final class BotanicalBreweryScenes {
                 "The Botanical Brewery infuses special containers with powerful Brews")
             .placeNearTarget()
             .attachKeyFrame();
-        scene.idle(75);
+        // 85, not 75: text windows fade in/out over 5 ticks each beyond their declared duration
+        // (a 70-tick text is on screen for 80 ticks) - 85 leaves a small margin past that.
+        scene.idle(85);
 
         List<ItemStack> ingredients = List.of(
             botaniaItem("vial"),

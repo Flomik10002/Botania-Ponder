@@ -212,7 +212,9 @@ public final class RedStringScenes {
         scene.idle(10);
         scene.overlay().showOutlineWithText(util.select().position(SOURCE), 55, description)
             .placeNearTarget().attachKeyFrame();
-        scene.idle(60);
+        // 65, not 60: text windows fade in/out over 5 ticks each beyond their declared duration
+        // (TextInstruction/FadeInOutInstruction), so a 55-tick text is on screen for 65 ticks.
+        scene.idle(65);
 
         scene.world().showSection(util.select().position(targetPos), Direction.DOWN);
         focusOn(scene, focus);
@@ -224,7 +226,9 @@ public final class RedStringScenes {
         scene.overlay().showText(50,
                 "The red face finds the nearest compatible block in a straight line, up to eight blocks away")
             .pointAt(util.vector().centerOf(targetPos)).placeNearTarget().attachKeyFrame();
-        scene.idle(55);
+        // 65, not 55: text windows fade in/out over 5 ticks each beyond their declared duration,
+        // so a 50-tick text needs at least 60 before the next scene's own text opens.
+        scene.idle(65);
     }
 
     private static void pulse(SceneBuilder scene, SceneBuildingUtil util, int duration) {

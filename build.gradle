@@ -33,8 +33,12 @@ minecraft {
     // Simply re-run your setup task after changing the mappings to update your workspace.
     mappings channel: mapping_channel, version: mapping_version
 
-    // Tell FG to not automatically create the reobf tasks, as we now use Official mappings at runtime, If you don't use them at dev time then you'll have to fix your reobf yourself.
-    reobf = false
+    // Forge (unlike NeoForge) still ships an SRG-obfuscated production client jar
+    // (client-*-srg.jar); reobf must stay on the default (true) so `gradlew build` remaps our
+    // compiled classes' bytecode from official Mojang names back to SRG before packaging.
+    // Disabling this ships an official-named jar that links fine in dev (runClient uses an
+    // official-named MC jar) but throws NoSuchMethodError on every direct vanilla-method call
+    // (e.g. Vec3.add) the moment it's loaded by a real production Forge install.
 
     // When true, this property will have all Eclipse/IntelliJ IDEA run configurations run the "prepareX" task for the given run configuration before launching the game.
     // In most cases, it is not necessary to enable.
@@ -166,7 +170,11 @@ dependencies {
     // (white_concrete + light_gray_concrete - see PonderSchematicProvider#withCheckerboardFloor).
     // v0.5.0 includes synchronized visible sections/BlockEntity states, fluid rendering,
     // named keyframes, navigation categories, custom elements, sounds and Ponder Doctor.
-    implementation fg.deobf('com.github.Flomik10002:PonderLib:v0.7.0-forge-1.20.1')
+    // v0.7.0 predates the native eased/collision-free entity movement used for the Mana Pool
+    // diamond drop (see docs/PONDERLIB_FIXES.md); v0.7.1 predates a production-Forge
+    // SchematicLoader crash fix; v0.7.2 predates an idle()-not-blocking-the-timeline fix plus
+    // the ported hold-to-ponder localisation and scene info plaque.
+    implementation fg.deobf('com.github.Flomik10002:PonderLib:v0.7.2-forge-1.20.1')
 
     // Botania - the mod this addon documents. fg.deobf() is required here for the same reason.
     // The FULL jar, not the ':api' classifier, on purpose: scenes here drive Botania's own block
