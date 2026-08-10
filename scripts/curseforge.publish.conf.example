@@ -1,0 +1,67 @@
+# Config for scripts/publish-curseforge.sh
+#
+# Copy this file to "curseforge.publish.conf" (either next to this script,
+# or in the repo root — the repo root takes priority) and fill it in.
+# This file is plain bash, sourced by the script — no secrets belong here.
+# Put CURSEFORGE_API_TOKEN in your shell environment or in a gitignored
+# ".env.curseforge" file next to the config instead.
+
+# Required. Find it on your project's CurseForge page under
+# "About Project" > right sidebar, or in the URL of legacy.curseforge.com.
+CF_PROJECT_ID=""
+
+# Optional. Used only to print a direct link to the uploaded file.
+CF_PROJECT_SLUG=""
+
+# Space-separated CurseForge game-version names this file supports.
+# Leave empty to auto-detect from gradle.properties' minecraft_version.
+# Must match names from https://minecraft.curseforge.com/api/game/versions
+# exactly (the script will tell you close matches if you get it wrong).
+# Only set this manually if you support more MC versions than the one you
+# build against, or gradle.properties doesn't have minecraft_version=.
+CF_MC_VERSIONS=""
+
+# Space-separated mod loader names, e.g. "Forge", "Fabric", "NeoForge", "Quilt".
+# Leave empty to auto-detect from the plugin ids in build.gradle
+# (net.minecraftforge.gradle / fabric-loom / net.neoforged / org.quiltmc.loom).
+CF_MOD_LOADERS=""
+
+# Optional extra game-version entries, e.g. "Java 17".
+CF_JAVA_VERSIONS=""
+
+# release | beta | alpha. Can be overridden per run with --release-type.
+CF_RELEASE_TYPE="release"
+
+# Prefix stripped from the git tag to get the mod version (v1.2.3 -> 1.2.3).
+CF_TAG_PREFIX="v"
+
+# Glob (relative to the repo root) used to find the build artifact.
+# {version} and {tag} are substituted before matching. Must match exactly
+# one file — narrow it down if your build produces several jars.
+CF_JAR_GLOB="build/libs/*{version}*.jar"
+
+# Extended-regex filenames to exclude from CF_JAR_GLOB matches (sources/dev
+# jars etc.). Leave empty to disable filtering.
+CF_JAR_EXCLUDE_PATTERN="-(sources|dev|shadow|api)\.jar$"
+
+# Where to pull the per-version changelog text from. The script looks for a
+# "## <version>" heading (Keep a Changelog style) and takes everything up to
+# the next "## " heading. Falls back to the git tag/commit message if not found.
+CF_CHANGELOG_FILE="CHANGELOG.md"
+CF_CHANGELOG_TYPE="markdown"
+
+# Template for the file's display name on CurseForge.
+# Placeholders: {mod_name} {version} {tag}
+CF_DISPLAY_NAME_TEMPLATE="{mod_name} {version}"
+
+# Leave empty to auto-detect from gradle.properties' mod_name, falling back
+# to the repo directory name.
+CF_MOD_NAME=""
+
+# Optional shell command run (from the repo root) before locating the jar,
+# e.g. "./gradlew build". Leave empty to skip and use an already-built jar.
+CF_BUILD_COMMAND=""
+
+# Where to remember which tags were already published (repo-root relative).
+# Keyed by CF_PROJECT_ID, so one state file is safe to reuse across configs.
+CF_STATE_FILE=".curseforge-published.json"

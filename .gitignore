@@ -27,3 +27,7 @@ CLAUDE.md
 logs
 ManaScenes-review.md
 src/generated/resources/.cache/
+
+# CurseForge publish script — local state and secrets, never committed
+.curseforge-published.json
+.env.curseforge
