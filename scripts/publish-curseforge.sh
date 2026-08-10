@@ -361,38 +361,20 @@ if [[ "$ASSUME_YES" -ne 1 ]]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Resolve CurseForge game version IDs
-# ---------------------------------------------------------------------------
-
-info "Fetching CurseForge game version list..."
-VERSIONS_JSON="$(curl -sSf -H "X-Api-Token: $CURSEFORGE_API_TOKEN" \
-  "https://minecraft.curseforge.com/api/game/versions")" \
-  || die "Failed to fetch game versions from CurseForge (check your API token)."
-
-GAME_VERSION_IDS=()
-for name in $CF_MC_VERSIONS $CF_MOD_LOADERS $CF_JAVA_VERSIONS; do
-  id="$(jq -r --arg n "$name" 'map(select(.name == $n)) | .[0].id // empty' <<<"$VERSIONS_JSON")"
-  if [[ -z "$id" ]]; then
-    warn "No exact CurseForge game-version match for '$name'. Close matches:"
-    jq -r --arg n "$name" 'map(select(.name | ascii_downcase | contains($n | ascii_downcase))) | .[].name' <<<"$VERSIONS_JSON" | sed 's/^/    /' >&2
-    die "Fix CF_MC_VERSIONS / CF_MOD_LOADERS / CF_JAVA_VERSIONS in $CONFIG_PATH."
-  fi
-  GAME_VERSION_IDS+=("$id")
-done
-
-GAME_VERSIONS_JSON="$(printf '%s\n' "${GAME_VERSION_IDS[@]}" | jq -R 'tonumber' | jq -s '.')"
-
-# ---------------------------------------------------------------------------
 # Upload
 # ---------------------------------------------------------------------------
+# gameVersionNames takes plain names directly (e.g. "1.20.1", "Forge"), no
+# need to resolve them to numeric ids via a separate API call first.
+
+GAME_VERSION_NAMES_JSON="$(printf '%s\n' $CF_MC_VERSIONS $CF_MOD_LOADERS $CF_JAVA_VERSIONS | jq -R . | jq -s .)"
 
 METADATA_JSON="$(jq -n \
   --arg changelog "$CHANGELOG" \
   --arg changelogType "$CF_CHANGELOG_TYPE" \
   --arg displayName "$DISPLAY_NAME" \
   --arg releaseType "$CF_RELEASE_TYPE" \
-  --argjson gameVersions "$GAME_VERSIONS_JSON" \
-  '{changelog: $changelog, changelogType: $changelogType, displayName: $displayName, releaseType: $releaseType, gameVersions: $gameVersions}')"
+  --argjson gameVersionNames "$GAME_VERSION_NAMES_JSON" \
+  '{changelog: $changelog, changelogType: $changelogType, displayName: $displayName, releaseType: $releaseType, gameVersionNames: $gameVersionNames}')"
 
 info "Uploading $JAR_NAME to CurseForge project $CF_PROJECT_ID..."
 
