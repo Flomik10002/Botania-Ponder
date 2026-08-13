@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import vazkii.botania.client.fx.SparkleParticleData;
 import vazkii.botania.common.block.block_entity.mana.ManaPoolBlockEntity;
-import vazkii.botania.common.block.block_entity.mana.ManaSpreaderBlockEntity;
 
 import java.util.List;
 
@@ -35,6 +34,7 @@ public final class ManaDeviceScenes {
             voidPos, "The Mana Void accepts an unlimited amount of Mana and permanently destroys it");
 
         scene.world().showSection(util.select().position(spreaderPos), Direction.DOWN);
+        ManaSpreaderScenes.aimSpreader(scene, spreaderPos, voidPos);
         focusOn(scene, voidCenter);
         scene.idle(10);
         scene.overlay().showText(55, "Aim a Mana Spreader directly at the Void")
@@ -63,6 +63,7 @@ public final class ManaDeviceScenes {
 
         Selection support = util.select().position(spreaderPos).add(util.select().position(lampPos));
         scene.world().showSection(support, Direction.DOWN);
+        ManaSpreaderScenes.aimSpreader(scene, spreaderPos, detectorPos);
         focusOn(scene, detectorCenter);
         scene.idle(10);
         scene.overlay().showText(60, "Mana Bursts pass through the Detector instead of being absorbed")
@@ -113,6 +114,7 @@ public final class ManaDeviceScenes {
         scene.idle(70);
 
         scene.world().showSection(util.select().position(spreaderPos), Direction.DOWN);
+        ManaSpreaderScenes.aimSpreader(scene, spreaderPos, distributorPos);
         focusOn(scene, distributorCenter);
         scene.idle(10);
         ManaSpreaderScenes.burstTrail(scene, spreaderCenter, distributorCenter);
@@ -169,11 +171,10 @@ public final class ManaDeviceScenes {
             .pointAt(turntableCenter)
             .placeNearTarget()
             .colored(PonderPalette.OUTPUT);
-        for (int tick = 0; tick < 60; tick++) {
-            scene.world().modifyBlockEntity(spreaderPos, ManaSpreaderBlockEntity.class,
-                spreader -> spreader.rotationX = (spreader.rotationX + 2F) % 360F);
-            scene.idle(1);
-        }
+        // Both shown block entities tick normally in Ponder. The Turntable's own ticker rotates
+        // the Spreader by its configured one degree per tick; manually changing rotationX here
+        // would stack with that real tick and make the model jump or run several times too fast.
+        scene.idle(60);
         scene.effects().indicateSuccess(turntablePos);
         scene.idle(8);
         scene.markAsFinished();

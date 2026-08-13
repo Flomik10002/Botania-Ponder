@@ -80,6 +80,7 @@ public final class ManaLensScenes {
         focusOn(scene, focus);
         scene.idle(15);
         scene.world().showSection(util.select().position(spreaderPos), Direction.DOWN);
+        ManaSpreaderScenes.aimSpreader(scene, spreaderPos, targetPos);
         focusOn(scene, focus);
         scene.idle(10);
 
@@ -201,8 +202,6 @@ public final class ManaLensScenes {
             }
             case FIRE -> {
                 trail(scene, spreader, target, 24);
-                // TODO(PONDERLIB-FIX): fire blocks currently render incorrectly inside captured
-                // schematic sections. Recheck Kindle after the next PonderLib rendering update.
                 scene.world().setBlock(targetPos.above(), Blocks.FIRE.defaultBlockState());
                 scene.effects().emitParticles(target.add(0, 1, 0),
                     scene.effects().simpleParticleEmitter(ParticleTypes.FLAME, Vec3.ZERO), 7, 3);
@@ -235,8 +234,6 @@ public final class ManaLensScenes {
             }
             case LIGHT -> {
                 trail(scene, spreader, target, 24);
-                // TODO(PONDERLIB-FIX): Mana Flame has the same captured-section rendering issue
-                // as vanilla fire. Recheck Flash after the next PonderLib rendering update.
                 scene.world().setBlock(targetPos.above(), BotaniaBlocks.manaFlame.defaultBlockState());
                 scene.effects().emitSparks(target.add(0, 1, 0), 0x80FFB0, 8);
                 scene.overlay().showOutlineWithText(util.select().position(targetPos.above()), 45,
@@ -259,9 +256,7 @@ public final class ManaLensScenes {
                 scene.overlay().showLine(PonderPalette.INPUT, target, oldAim, 28);
                 scene.idle(28);
                 trail(scene, spreader, target, 24);
-                scene.world().modifyBlockEntity(targetPos, ManaSpreaderBlockEntity.class, other -> {
-                    other.rotationX = (other.rotationX + 90F) % 360F;
-                });
+                ManaSpreaderScenes.aimSpreader(scene, targetPos, spreaderPos);
                 scene.overlay().showBigLine(PonderPalette.OUTPUT, target, spreader, 45);
                 scene.effects().emitSparks(target, 0x60D080, 8);
                 scene.idle(45);

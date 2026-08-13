@@ -13,6 +13,14 @@ import dev.flomik.botania_ponder.ponder.scenes.PetalApothecaryScenes;
 import dev.flomik.botania_ponder.ponder.scenes.PureDaisyScenes;
 import dev.flomik.botania_ponder.ponder.scenes.RunicAltarScenes;
 import dev.flomik.botania_ponder.ponder.scenes.RedStringScenes;
+import dev.flomik.botania_ponder.ponder.scenes.CorporeaScenes;
+import dev.flomik.botania_ponder.ponder.scenes.DrumScenes;
+import dev.flomik.botania_ponder.ponder.scenes.AdvancedCraftingScenes;
+import dev.flomik.botania_ponder.ponder.scenes.UtilityBlockScenes;
+import dev.flomik.botania_ponder.ponder.scenes.AutomationScenes;
+import dev.flomik.botania_ponder.ponder.scenes.AdvancedManaDeviceScenes;
+import dev.flomik.botania_ponder.ponder.scenes.RemainingUtilityScenes;
+import dev.flomik.botania_ponder.ponder.scenes.LuminizerScenes;
 import dev.flomik.ponderlib.api.PonderColorScheme;
 import dev.flomik.ponderlib.api.registration.PonderPlugin;
 import dev.flomik.ponderlib.api.registration.PonderSceneRegistrationHelper;
@@ -34,6 +42,10 @@ public class BotaniaPonderPlugin implements PonderPlugin {
     private static final ResourceLocation CRAFTING = tag("crafting");
     private static final ResourceLocation MANA_LENSES = tag("mana_lenses");
     private static final ResourceLocation RED_STRING = tag("red_string");
+    private static final ResourceLocation CORPOREA = tag("corporea");
+    private static final ResourceLocation DRUMS = tag("drums");
+    private static final ResourceLocation ADVANCED_CRAFTING = tag("advanced_crafting");
+    private static final ResourceLocation UTILITY_BLOCKS = tag("utility_blocks");
 
     private static final PonderColorScheme COLORS = PonderColorScheme.builder()
         .finishingFlash(0x79AD87)
@@ -193,6 +205,18 @@ public class BotaniaPonderPlugin implements PonderPlugin {
             ManaDeviceScenes::openCrate, MANA_DEVICES);
         addStoryBoard(helper, botania("turntable"), "mana_devices/spreader_turntable",
             ManaDeviceScenes::spreaderTurntable, MANA_DEVICES);
+        addStoryBoard(helper, botania("redstone_spreader"), "mana_devices/redstone_spreader",
+            AdvancedManaDeviceScenes::redstoneSpreader, MANA_DEVICES);
+        addStoryBoard(helper, botania("elven_spreader"), "mana_devices/elven_spreader",
+            AdvancedManaDeviceScenes::elvenSpreader, MANA_DEVICES);
+        addStoryBoard(helper, botania("gaia_spreader"), "mana_devices/gaia_spreader",
+            AdvancedManaDeviceScenes::gaiaSpreader, MANA_DEVICES);
+        addStoryBoard(helper, botania("mana_pylon"), "mana_devices/mana_pylon",
+            AdvancedManaDeviceScenes::manaPylon, MANA_DEVICES);
+        addStoryBoard(helper, botania("natura_pylon"), "mana_devices/natura_pylon",
+            AdvancedManaDeviceScenes::naturaPylon, MANA_DEVICES);
+        addStoryBoard(helper, botania("gaia_pylon"), "mana_devices/gaia_pylon",
+            AdvancedManaDeviceScenes::gaiaPylon, MANA_DEVICES);
 
         addStoryBoard(helper, botania("red_string_container"), "red_string/container",
             RedStringScenes::container, RED_STRING);
@@ -206,6 +230,87 @@ public class BotaniaPonderPlugin implements PonderPlugin {
             RedStringScenes::relay, RED_STRING);
         addStoryBoard(helper, botania("red_string_interceptor"), "red_string/interceptor",
             RedStringScenes::interceptor, RED_STRING);
+
+        addStoryBoard(helper, botania("corporea_index"), "corporea/index",
+            CorporeaScenes::index, CORPOREA);
+        addStoryBoard(helper, botania("corporea_funnel"), "corporea/funnel",
+            CorporeaScenes::funnel, CORPOREA);
+        addStoryBoard(helper, botania("corporea_crystal_cube"), "corporea/crystal_cube",
+            CorporeaScenes::crystalCube, CORPOREA);
+        addStoryBoard(helper, botania("corporea_interceptor"), "corporea/interceptor",
+            CorporeaScenes::interceptor, CORPOREA);
+        addStoryBoard(helper, botania("corporea_retainer"), "corporea/retainer",
+            CorporeaScenes::retainer, CORPOREA);
+
+        addStoryBoard(helper, botania("drum_wild"), "drums/wild",
+            DrumScenes::wild, DRUMS);
+        addStoryBoard(helper, botania("drum_canopy"), "drums/canopy",
+            DrumScenes::canopy, DRUMS);
+        addStoryBoard(helper, botania("drum_gathering"), "drums/gathering_shear",
+            DrumScenes::gatheringShear, DRUMS);
+        addStoryBoard(helper, botania("drum_gathering"), "drums/gathering_milk",
+            DrumScenes::gatheringMilk, DRUMS);
+        addStoryBoard(helper, botania("drum_gathering"), "drums/gathering_egg",
+            DrumScenes::gatheringEgg, DRUMS);
+
+        addStoryBoard(helper, botania("alchemy_catalyst"), "advanced_crafting/alchemy_catalyst",
+            AdvancedCraftingScenes::alchemyCatalyst, ADVANCED_CRAFTING);
+        addStoryBoard(helper, botania("conjuration_catalyst"), "advanced_crafting/conjuration_catalyst",
+            AdvancedCraftingScenes::conjurationCatalyst, ADVANCED_CRAFTING);
+        addStoryBoard(helper, botania("terra_plate"), "advanced_crafting/terra_plate",
+            AdvancedCraftingScenes::terraPlate, ADVANCED_CRAFTING);
+        addStoryBoard(helper, botania("enchanter"), "advanced_crafting/mana_enchanter",
+            AdvancedCraftingScenes::manaEnchanter, ADVANCED_CRAFTING);
+        addStoryBoard(helper, botania("alfheim_portal"), "advanced_crafting/alfheim_portal",
+            AdvancedCraftingScenes::alfheimPortal, ADVANCED_CRAFTING);
+
+        addStoryBoard(helper, botania("ender_eye_block"), "utility_blocks/ender_overseer",
+            UtilityBlockScenes::enderOverseer, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("forest_eye"), "utility_blocks/eye_of_the_ancients",
+            UtilityBlockScenes::eyeOfTheAncients, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("mana_fluxfield"), "utility_blocks/mana_fluxfield",
+            UtilityBlockScenes::manaFluxfield, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("spawner_claw"), "utility_blocks/life_imbuer",
+            UtilityBlockScenes::lifeImbuer, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("prism"), "utility_blocks/mana_prism",
+            UtilityBlockScenes::manaPrism, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("spark_changer"), "utility_blocks/spark_tinkerer",
+            UtilityBlockScenes::sparkTinkerer, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("bellows"), "utility_blocks/bellows",
+            UtilityBlockScenes::bellows, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("tiny_planet_block"), "utility_blocks/tiny_planet",
+            UtilityBlockScenes::tinyPlanet, UTILITY_BLOCKS);
+
+        addStoryBoard(helper, botania("crafty_crate"), "automation/crafty_crate",
+            AutomationScenes::craftyCrate, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("pump"), "automation/mana_pump",
+            AutomationScenes::manaPump, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("hourglass"), "automation/hovering_hourglass",
+            AutomationScenes::hoveringHourglass, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("abstruse_platform"), "automation/abstruse_platform",
+            AutomationScenes::abstrusePlatform, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("spectral_platform"), "automation/spectral_platform",
+            AutomationScenes::spectralPlatform, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("infrangible_platform"), "automation/infrangible_platform",
+            AutomationScenes::infrangiblePlatform, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("mana_bomb"), "automation/manastorm_charge",
+            AutomationScenes::manastormCharge, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("piston_relay"), "remaining_utility/force_relay", RemainingUtilityScenes::forceRelay, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("tiny_potato"), "remaining_utility/tiny_potato", RemainingUtilityScenes::tinyPotato, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("incense_plate"), "remaining_utility/incense_plate", RemainingUtilityScenes::incensePlate, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("cacophonium_block"), "remaining_utility/cacophonium", RemainingUtilityScenes::cacophonium, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("teru_teru_bozu"), "remaining_utility/teru_teru_bozu", RemainingUtilityScenes::teruTeruBozu, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("avatar"), "remaining_utility/avatar", RemainingUtilityScenes::avatar, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("animated_torch"), "remaining_utility/animated_torch", RemainingUtilityScenes::animatedTorch, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("cocoon"), "remaining_utility/cocoon", RemainingUtilityScenes::cocoon, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("fel_pumpkin"), "remaining_utility/fel_pumpkin", RemainingUtilityScenes::felPumpkin, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("starfield"), "remaining_utility/starfield", RemainingUtilityScenes::starfield, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("ghost_rail"), "luminizer/spectral_rail", LuminizerScenes::spectralRail, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("light_relay"), "luminizer/default", LuminizerScenes::luminizer, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("fork_light_relay"), "luminizer/fork", LuminizerScenes::fork, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("toggle_light_relay"), "luminizer/toggle", LuminizerScenes::toggle, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("detector_light_relay"), "luminizer/detector", LuminizerScenes::detector, UTILITY_BLOCKS);
+        addStoryBoard(helper, botania("light_launcher"), "luminizer/launcher", LuminizerScenes::launcher, UTILITY_BLOCKS);
     }
 
     @Override
@@ -254,7 +359,9 @@ public class BotaniaPonderPlugin implements PonderPlugin {
         helper.addToTag(MANA_DEVICES,
             botania("mana_pool"), botania("mana_spreader"), botania("mana_void"),
             botania("mana_detector"), botania("mana_distributor"), botania("open_crate"),
-            botania("turntable"));
+            botania("turntable"), botania("redstone_spreader"), botania("elven_spreader"),
+            botania("gaia_spreader"), botania("mana_pylon"), botania("natura_pylon"),
+            botania("gaia_pylon"));
 
         helper.registerTag(CRAFTING)
             .title("Botanical Crafting")
@@ -293,6 +400,54 @@ public class BotaniaPonderPlugin implements PonderPlugin {
             botania("red_string_container"), botania("red_string_dispenser"),
             botania("red_string_fertilizer"), botania("red_string_comparator"),
             botania("red_string_relay"), botania("red_string_interceptor"));
+
+        helper.registerTag(CORPOREA)
+            .title("Corporea")
+            .description("Spark networks that search, request, count, and automate stored items")
+            .icon(botaniaBlock("corporea_index"))
+            .addToIndex()
+            .register();
+        helper.addToTag(CORPOREA,
+            botania("corporea_index"), botania("corporea_funnel"),
+            botania("corporea_crystal_cube"), botania("corporea_interceptor"),
+            botania("corporea_retainer"));
+
+        helper.registerTag(DRUMS)
+            .title("Botania Drums")
+            .description("Mana-triggered drums for harvesting plants and gathering animal produce")
+            .icon(botaniaBlock("drum_wild"))
+            .addToIndex()
+            .register();
+        helper.addToTag(DRUMS,
+            botania("drum_wild"), botania("drum_gathering"), botania("drum_canopy"));
+
+        helper.registerTag(ADVANCED_CRAFTING)
+            .title("Advanced Mana Crafting")
+            .description("Catalysts and multiblocks for high-tier Mana transformations")
+            .icon(botaniaBlock("terra_plate"))
+            .addToIndex()
+            .register();
+        helper.addToTag(ADVANCED_CRAFTING,
+            botania("alchemy_catalyst"), botania("conjuration_catalyst"),
+            botania("terra_plate"), botania("enchanter"), botania("alfheim_portal"));
+
+        helper.registerTag(UTILITY_BLOCKS)
+            .title("Botania Utilities")
+            .description("Small devices for sensing, automation, energy, and Mana control")
+            .icon(botaniaBlock("ender_eye_block"))
+            .addToIndex()
+            .register();
+        helper.addToTag(UTILITY_BLOCKS,
+            botania("ender_eye_block"), botania("forest_eye"), botania("mana_fluxfield"),
+            botania("spawner_claw"), botania("prism"), botania("spark_changer"),
+            botania("bellows"), botania("tiny_planet_block"), botania("crafty_crate"),
+            botania("pump"), botania("hourglass"), botania("abstruse_platform"),
+            botania("spectral_platform"), botania("infrangible_platform"), botania("mana_bomb"),
+            botania("piston_relay"), botania("tiny_potato"), botania("incense_plate"),
+            botania("cacophonium_block"), botania("teru_teru_bozu"), botania("avatar"),
+            botania("animated_torch"), botania("cocoon"), botania("fel_pumpkin"), botania("starfield"),
+            botania("ghost_rail"), botania("light_relay"), botania("fork_light_relay"),
+            botania("toggle_light_relay"), botania("detector_light_relay"), botania("light_launcher"));
     }
 
     private static ResourceLocation botania(String path) {

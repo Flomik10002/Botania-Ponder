@@ -83,6 +83,7 @@ public final class BotanicalBreweryScenes {
         scene.addKeyframe();
 
         scene.world().showSection(util.select().position(spreaderPos), Direction.DOWN);
+        ManaSpreaderScenes.aimSpreader(scene, spreaderPos, breweryPos);
         focusOn(scene, breweryCenter);
         scene.idle(10);
         scene.overlay().showText(60, "The Brewery consumes Mana only after a valid recipe is assembled")

@@ -20,7 +20,11 @@ At the same time, the scenes are deliberately kept small. Pondering a block shou
 
 ## Current coverage
 
-Botania Ponder currently contains **83 scenes**.
+Botania Ponder currently contains **135 scenes**.
+
+The current block-and-device milestone contains 135 planned scenes: **all 135 complete**.
+Item, equipment, and challenge chapters are tracked separately until their
+individual scenes have been scoped.
 
 A large part of Botania's flora is already covered. There are scenes for all standard functional flowers and thirteen generating flowers, including the Endoflame. Their demonstrations focus on the individual behavior of each flower rather than repeating a generic description of the generating and functional flora systems.
 
@@ -28,7 +32,22 @@ The standard Mana Lens set is also extensively documented, with **25 lens scenes
 
 The Red String family currently has six scenes covering the Container, Dispenser, Nutrifier, Comparator, Spoofer and Interceptor variants.
 
+The core Corporea request chain has five focused scenes for the Index, Funnel, Crystal Cube,
+Interceptor and Retainer.
+
+The complete Drum family is covered by five scenes: vegetation clearing, canopy removal, animal
+shearing, bucket milking and chicken egg-timer acceleration.
+
+Advanced Mana crafting includes the Alchemy and Conjuration Catalysts, Terrestrial Agglomeration
+Plate, Mana Enchanter, and Alfheim Portal.
+
 Core mana infrastructure is represented as well. Existing scenes cover Mana Pool filling and infusion, the Mana Spreader, Mana Void, Mana Detector, Mana Splitter, Open Crate and Spreader Turntable.
+
+The utility chapter additionally covers the Ender Overseer, Eye of the Ancients, Mana Fluxfield,
+Life Imbuer, Mana Prism, Spark Tinkerer, Bellows, and Tiny Planet.
+
+Automation coverage includes the Crafty Crate, Mana Pump, Hovering Hourglass, Manastorm Charge,
+and the complete Abstruse, Spectral, and Infrangible Platform family.
 
 Several of Botania's major crafting mechanics already have their own demonstrations, including the **Pure Daisy, Petal Apothecary, Runic Altar and Botanical Brewery**.
 
@@ -38,13 +57,16 @@ For a version-by-version list of additions and changes, see [CHANGELOG.md](CHANG
 
 ## What's still missing
 
-Botania is large enough that 83 scenes still leave plenty of territory untouched.
+Botania is large enough that 135 scenes still leave plenty of territory untouched.
 
 Equipment is currently one of the largest missing areas. Wands, rings, bands, armor and the manasteel, elementium and terrasteel equipment families do not yet have Ponder coverage.
 
-The Corporea system also remains largely untouched, including components such as the Corporea Index, Sparks, Retainer and Funnel.
+The core Corporea request blocks are covered, while broader network construction, the individual
+Spark augment modes and less common Corporea integrations still need their own demonstrations.
 
-Some individual interactions are intentionally left out when the current Ponder implementation cannot display them correctly. For example, **Mana Lens: Fire** and the flame effects used by the Endoflame and Exoflame currently run into a PonderLib rendering problem involving fire blocks inside captured scene sections. Those scenes are being held back rather than replacing the real effect with something visually convincing but mechanically false.
+Some interactions still need purpose-built scenes, but the previous captured-section rendering
+problem for fire and Mana Flame blocks is resolved by PonderLib 0.7.3. Kindle and Flash can now
+show their real placed blocks without proxy effects.
 
 More scenes and missing systems will be added as the project develops.
 

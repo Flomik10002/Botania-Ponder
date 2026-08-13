@@ -130,6 +130,7 @@ public final class ManaPoolScenes {
 
         // The source, revealed only now, and only because the Pool can't fill without one.
         scene.world().showSection(util.select().position(spreaderPos), Direction.DOWN);
+        ManaSpreaderScenes.aimSpreader(scene, spreaderPos, poolPos);
         // Keep the Pool as the point of interest from the first reveal tick, avoiding a later snap.
         scene.addInstruction(s -> s.setFocusPoint(poolCenter));
         scene.idle(10);

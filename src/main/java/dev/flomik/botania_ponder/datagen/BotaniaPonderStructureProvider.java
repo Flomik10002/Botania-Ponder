@@ -93,7 +93,15 @@ public class BotaniaPonderStructureProvider implements DataProvider {
             manaDistributor(output),
             openCrate(output),
             spreaderTurntable(output),
-            redStringBlocks(output)
+            redStringBlocks(output),
+            corporeaBlocks(output),
+            drumBlocks(output),
+            advancedCraftingBlocks(output),
+            utilityBlocks(output),
+            automationBlocks(output),
+            advancedManaDevices(output),
+            remainingUtilityBlocks(output),
+            luminizerBlocks(output)
         );
     }
 
@@ -324,7 +332,8 @@ public class BotaniaPonderStructureProvider implements DataProvider {
         ListTag blocks = new ListTag();
         checkerboardFloor(palette, blocks, 5, (x, z) -> x == 2 && z == 2);
         addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:hopperhock"));
-        addBlock(blocks, 2, 1, 3, addPaletteEntry(palette, "minecraft:chest"));
+        addBlock(blocks, 2, 1, 3,
+            addPaletteEntry(palette, "minecraft:chest", "facing", "south"));
         return write(output, "functional_flora/hopperhock", root(palette, blocks, 5, 2, 5));
     }
 
@@ -575,7 +584,9 @@ public class BotaniaPonderStructureProvider implements DataProvider {
         };
         int target = path.equals("dispenser")
             ? addPaletteEntry(palette, targetId, "facing", "south")
-            : addPaletteEntry(palette, targetId);
+            : targetId.equals("minecraft:chest")
+                ? addPaletteEntry(palette, targetId, "facing", "south")
+                : addPaletteEntry(palette, targetId);
         addBlock(blocks, 3, 1, 5, target);
 
         switch (path) {
@@ -595,6 +606,472 @@ public class BotaniaPonderStructureProvider implements DataProvider {
         }
 
         return write(output, "red_string/" + path, root(palette, blocks, 7, 3, 7));
+    }
+
+    private CompletableFuture<?> corporeaBlocks(CachedOutput output) {
+        return CompletableFuture.allOf(
+            corporeaBlock(output, "index"),
+            corporeaBlock(output, "funnel"),
+            corporeaBlock(output, "crystal_cube"),
+            corporeaBlock(output, "interceptor"),
+            corporeaBlock(output, "retainer")
+        );
+    }
+
+    /** Shared seven-block Corporea network stage with one Master relay and one storage inventory. */
+    private CompletableFuture<?> corporeaBlock(CachedOutput output, String path) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 7);
+
+        addBlock(blocks, 1, 1, 3, addPaletteEntry(palette, "botania:corporea_block"));
+        addBlock(blocks, 5, 1, 5,
+            addPaletteEntry(palette, "minecraft:chest", "facing", "south"));
+
+        switch (path) {
+            case "index" -> addBlock(blocks, 3, 1, 2,
+                addPaletteEntry(palette, "botania:corporea_index"));
+            case "funnel" -> {
+                addBlock(blocks, 3, 1, 2,
+                    addPaletteEntry(palette, "minecraft:chest", "facing", "south"));
+                addBlock(blocks, 3, 2, 2, addPaletteEntry(palette, "botania:corporea_funnel"));
+            }
+            case "crystal_cube" -> addBlock(blocks, 3, 1, 2,
+                addPaletteEntry(palette, "botania:corporea_crystal_cube"));
+            case "interceptor" -> {
+                addBlock(blocks, 3, 1, 2, addPaletteEntry(palette, "botania:corporea_interceptor"));
+                addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "minecraft:redstone_lamp"));
+                addBlock(blocks, 5, 1, 2,
+                    addPaletteEntry(palette, "minecraft:chest", "facing", "south"));
+                addBlock(blocks, 5, 2, 2, addPaletteEntry(palette, "botania:corporea_funnel"));
+            }
+            case "retainer" -> {
+                addBlock(blocks, 3, 1, 2, addPaletteEntry(palette, "botania:corporea_retainer"));
+                addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:corporea_interceptor"));
+                addBlock(blocks, 5, 1, 2,
+                    addPaletteEntry(palette, "minecraft:chest", "facing", "south"));
+                addBlock(blocks, 5, 2, 2, addPaletteEntry(palette, "botania:corporea_funnel"));
+            }
+            default -> throw new IllegalArgumentException("Unknown Corporea scene: " + path);
+        }
+
+        return write(output, "corporea/" + path, root(palette, blocks, 7, 3, 7));
+    }
+
+    private CompletableFuture<?> drumBlocks(CachedOutput output) {
+        return CompletableFuture.allOf(
+            drumBlock(output, "wild"),
+            drumBlock(output, "canopy"),
+            drumBlock(output, "gathering_shear"),
+            drumBlock(output, "gathering_milk"),
+            drumBlock(output, "gathering_egg")
+        );
+    }
+
+    /** Mana-triggered Drum stages; entities and loose containers are added by their scenes. */
+    private CompletableFuture<?> drumBlock(CachedOutput output, String path) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        boolean wild = path.equals("wild");
+        boolean canopy = path.equals("canopy");
+        checkerboardFloor(palette, blocks, 7,
+            (x, z) -> canopy && x == 3 && z == 5 || wild && z == 5 && (x == 1 || x == 2 || x == 5),
+            (x, z) -> wild && z == 5 && (x == 3 || x == 4));
+
+        String drum = switch (path) {
+            case "wild" -> "botania:drum_wild";
+            case "canopy" -> "botania:drum_canopy";
+            case "gathering_shear", "gathering_milk", "gathering_egg" -> "botania:drum_gathering";
+            default -> throw new IllegalArgumentException("Unknown Drum scene: " + path);
+        };
+        addBlock(blocks, 3, 1, 3, addPaletteEntry(palette, drum));
+        addBlock(blocks, 3, 1, 0, addPaletteEntry(palette, "botania:redstone_spreader"));
+
+        if (wild) {
+            addBlock(blocks, 1, 1, 5, addPaletteEntry(palette, "minecraft:grass"));
+            addBlock(blocks, 2, 1, 5, addPaletteEntry(palette, "minecraft:fern"));
+            addBlock(blocks, 3, 1, 5, addPaletteEntry(palette, "minecraft:wheat", "age", "7"));
+            addBlock(blocks, 4, 1, 5, addPaletteEntry(palette, "minecraft:carrots", "age", "7"));
+            addBlock(blocks, 5, 1, 5, addPaletteEntry(palette, "minecraft:poppy"));
+        } else if (canopy) {
+            int log = addPaletteEntry(palette, "minecraft:oak_log");
+            int leaves = addPaletteEntry(palette, "minecraft:oak_leaves", "persistent", "true");
+            addBlock(blocks, 3, 1, 5, log);
+            addBlock(blocks, 3, 2, 5, log);
+            for (int y = 3; y <= 4; y++) {
+                for (int x = 2; x <= 4; x++) {
+                    addBlock(blocks, x, y, 5, leaves);
+                }
+            }
+        }
+
+        return write(output, "drums/" + path, root(palette, blocks, 7, canopy ? 5 : 2, 7));
+    }
+
+    private CompletableFuture<?> advancedCraftingBlocks(CachedOutput output) {
+        return CompletableFuture.allOf(
+            catalystBlock(output, "alchemy_catalyst"),
+            catalystBlock(output, "conjuration_catalyst"),
+            terraPlateBlock(output),
+            manaEnchanterBlock(output),
+            alfheimPortalBlock(output)
+        );
+    }
+
+    private CompletableFuture<?> catalystBlock(CachedOutput output, String catalyst) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 7);
+        addBlock(blocks, 3, 1, 3, addPaletteEntry(palette, "botania:" + catalyst));
+        addBlock(blocks, 3, 2, 3, addPaletteEntry(palette, "botania:mana_pool"));
+        return write(output, "advanced_crafting/" + catalyst, root(palette, blocks, 7, 3, 7));
+    }
+
+    private CompletableFuture<?> terraPlateBlock(CachedOutput output) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        int light = addPaletteEntry(palette, "minecraft:white_concrete");
+        int dark = addPaletteEntry(palette, "minecraft:light_gray_concrete");
+        int livingrock = addPaletteEntry(palette, "botania:livingrock");
+        int lapis = addPaletteEntry(palette, "minecraft:lapis_block");
+        for (int x = 0; x < 7; x++) {
+            for (int z = 0; z < 7; z++) {
+                boolean platform = x >= 2 && x <= 4 && z >= 2 && z <= 4;
+                int state = platform ? ((x + z) % 2 == 0 ? livingrock : lapis)
+                    : ((x + z) % 2 == 0 ? light : dark);
+                addBlock(blocks, x, 0, z, state);
+            }
+        }
+        addBlock(blocks, 3, 1, 3, addPaletteEntry(palette, "botania:terra_plate"));
+        return write(output, "advanced_crafting/terra_plate", root(palette, blocks, 7, 2, 7));
+    }
+
+    private CompletableFuture<?> manaEnchanterBlock(CachedOutput output) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        int light = addPaletteEntry(palette, "minecraft:white_concrete");
+        int dark = addPaletteEntry(palette, "minecraft:light_gray_concrete");
+        int obsidian = addPaletteEntry(palette, "minecraft:obsidian");
+        String[] obsidianLayer = {
+            "___________", "____BBB____", "___B_B_B___", "___BBBBB___",
+            "___B_B_B___", "____BBB____", "___________"
+        };
+        for (int x = 0; x < 11; x++) {
+            for (int z = 0; z < 11; z++) {
+                boolean ring = z >= 2 && z <= 8 && obsidianLayer[z - 2].charAt(x) == 'B';
+                int state = ring ? obsidian
+                    : ((x + z) % 2 == 0 ? light : dark);
+                addBlock(blocks, x, 0, z, state);
+            }
+        }
+
+        int flower = addPaletteEntry(palette, "botania:white_mystical_flower");
+        int pylon = addPaletteEntry(palette, "botania:mana_pylon");
+        addBlock(blocks, 5, 1, 5, addPaletteEntry(palette, "botania:enchanter"));
+        int[][] flowers = { { 1, 2 }, { 9, 2 }, { 4, 4 }, { 6, 4 }, { 0, 5 },
+            { 10, 5 }, { 4, 6 }, { 6, 6 }, { 1, 8 }, { 9, 8 } };
+        for (int[] pos : flowers) {
+            addBlock(blocks, pos[0], 1, pos[1], flower);
+        }
+        int[][] pylons = { { 1, 2 }, { 9, 2 }, { 0, 5 }, { 10, 5 }, { 1, 8 }, { 9, 8 } };
+        for (int[] pos : pylons) {
+            addBlock(blocks, pos[0], 2, pos[1], pylon);
+        }
+        return write(output, "advanced_crafting/mana_enchanter", root(palette, blocks, 11, 3, 11));
+    }
+
+    private CompletableFuture<?> alfheimPortalBlock(CachedOutput output) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 11);
+        int vertical = addPaletteEntry(palette, "botania:livingwood_log", "axis", "y");
+        int horizontal = addPaletteEntry(palette, "botania:livingwood_log", "axis", "z");
+        int verticalGlimmer = addPaletteEntry(palette, "botania:glimmering_livingwood_log", "axis", "y");
+        int horizontalGlimmer = addPaletteEntry(palette, "botania:glimmering_livingwood_log", "axis", "z");
+        addBlock(blocks, 5, 1, 5, addPaletteEntry(palette, "botania:alfheim_portal"));
+        addBlock(blocks, 5, 1, 4, horizontal);
+        addBlock(blocks, 5, 1, 6, horizontal);
+        addBlock(blocks, 5, 2, 3, vertical);
+        addBlock(blocks, 5, 2, 7, vertical);
+        addBlock(blocks, 5, 3, 3, verticalGlimmer);
+        addBlock(blocks, 5, 3, 7, verticalGlimmer);
+        addBlock(blocks, 5, 4, 3, vertical);
+        addBlock(blocks, 5, 4, 7, vertical);
+        addBlock(blocks, 5, 5, 4, horizontal);
+        addBlock(blocks, 5, 5, 5, horizontalGlimmer);
+        addBlock(blocks, 5, 5, 6, horizontal);
+        int pool = addPaletteEntry(palette, "botania:mana_pool");
+        int naturaPylon = addPaletteEntry(palette, "botania:natura_pylon");
+        for (int z : new int[] { 2, 8 }) {
+            addBlock(blocks, 3, 1, z, pool);
+            addBlock(blocks, 3, 2, z, naturaPylon);
+        }
+        return write(output, "advanced_crafting/alfheim_portal", root(palette, blocks, 11, 6, 11));
+    }
+
+    private CompletableFuture<?> utilityBlocks(CachedOutput output) {
+        return CompletableFuture.allOf(
+            utilityBlock(output, "ender_overseer"),
+            utilityBlock(output, "eye_of_the_ancients"),
+            utilityBlock(output, "mana_fluxfield"),
+            utilityBlock(output, "life_imbuer"),
+            utilityBlock(output, "mana_prism"),
+            utilityBlock(output, "spark_tinkerer"),
+            utilityBlock(output, "bellows"),
+            utilityBlock(output, "tiny_planet")
+        );
+    }
+
+    private CompletableFuture<?> utilityBlock(CachedOutput output, String path) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 5);
+        int height = 2;
+        switch (path) {
+            case "ender_overseer" -> {
+                addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:ender_eye_block"));
+                addBlock(blocks, 2, 1, 3, addPaletteEntry(palette, "minecraft:redstone_lamp"));
+            }
+            case "eye_of_the_ancients" -> {
+                addBlock(blocks, 2, 1, 3, addPaletteEntry(palette, "botania:forest_eye"));
+                // Faces north because it reads the Eye behind it at z=3 and outputs to the lamp at z=1.
+                addBlock(blocks, 2, 1, 2,
+                    addPaletteEntry(palette, "minecraft:comparator", "facing", "north"));
+                addBlock(blocks, 2, 1, 1, addPaletteEntry(palette, "minecraft:redstone_lamp"));
+            }
+            case "mana_fluxfield" -> {
+                addBlock(blocks, 2, 1, 3, addPaletteEntry(palette, "botania:mana_fluxfield"));
+                addBlock(blocks, 2, 1, 0, addPaletteEntry(palette, "botania:mana_spreader"));
+            }
+            case "life_imbuer" -> {
+                addBlock(blocks, 2, 1, 3, addPaletteEntry(palette, "minecraft:spawner"));
+                addBlock(blocks, 2, 2, 3, addPaletteEntry(palette, "botania:spawner_claw"));
+                addBlock(blocks, 2, 1, 0, addPaletteEntry(palette, "botania:mana_spreader"));
+                height = 3;
+            }
+            case "mana_prism" -> {
+                addBlock(blocks, 2, 1, 0, addPaletteEntry(palette, "botania:mana_spreader"));
+                addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:prism"));
+                addBlock(blocks, 2, 1, 4, addPaletteEntry(palette, "botania:mana_pool"));
+            }
+            case "spark_tinkerer" -> {
+                addBlock(blocks, 2, 1, 2,
+                    addPaletteEntry(palette, "botania:spark_changer", "powered", "false"));
+                addBlock(blocks, 3, 1, 2, addPaletteEntry(palette, "botania:mana_pool"));
+            }
+            case "bellows" -> {
+                addBlock(blocks, 2, 1, 2,
+                    addPaletteEntry(palette, "botania:bellows", "facing", "south"));
+                addBlock(blocks, 2, 1, 3,
+                    addPaletteEntry(palette, "minecraft:furnace", "facing", "south"));
+            }
+            case "tiny_planet" -> {
+                addBlock(blocks, 2, 1, 0, addPaletteEntry(palette, "botania:mana_spreader"));
+                addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:tiny_planet_block"));
+                addBlock(blocks, 4, 1, 2, addPaletteEntry(palette, "botania:mana_pool"));
+            }
+            default -> throw new IllegalArgumentException("Unknown utility scene: " + path);
+        }
+        return write(output, "utility_blocks/" + path, root(palette, blocks, 5, height, 5));
+    }
+
+    private CompletableFuture<?> automationBlocks(CachedOutput output) {
+        return CompletableFuture.allOf(
+            automationBlock(output, "crafty_crate"),
+            automationBlock(output, "mana_pump"),
+            automationBlock(output, "hovering_hourglass"),
+            automationBlock(output, "abstruse_platform"),
+            automationBlock(output, "spectral_platform"),
+            automationBlock(output, "infrangible_platform"),
+            automationBlock(output, "manastorm_charge")
+        );
+    }
+
+    private CompletableFuture<?> automationBlock(CachedOutput output, String path) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        checkerboardFloor(palette, blocks, 5);
+        int height = 4;
+        switch (path) {
+            case "crafty_crate" -> addBlock(blocks, 2, 2, 2,
+                addPaletteEntry(palette, "botania:crafty_crate", "pattern", "crafty_2_2"));
+            case "mana_pump" -> {
+                addBlock(blocks, 1, 1, 2, addPaletteEntry(palette, "botania:mana_pool"));
+                addBlock(blocks, 2, 1, 2,
+                    addPaletteEntry(palette, "botania:pump", "facing", "west"));
+                addBlock(blocks, 3, 1, 2,
+                    addPaletteEntry(palette, "minecraft:rail", "shape", "north_south"));
+            }
+            case "hovering_hourglass" -> {
+                addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:hourglass"));
+                addBlock(blocks, 2, 1, 3, addPaletteEntry(palette, "minecraft:redstone_lamp"));
+            }
+            case "abstruse_platform" ->
+                addBlockEntity(blocks, 2, 2, 2,
+                    addPaletteEntry(palette, "botania:abstruse_platform"), "botania:platform");
+            case "spectral_platform" -> {
+                addBlockEntity(blocks, 2, 2, 2,
+                    addPaletteEntry(palette, "botania:spectral_platform"), "botania:platform");
+                addBlock(blocks, 2, 3, 2, addPaletteEntry(palette, "minecraft:redstone_torch"));
+            }
+            case "infrangible_platform" ->
+                addBlockEntity(blocks, 2, 1, 2,
+                    addPaletteEntry(palette, "botania:infrangible_platform"), "botania:platform");
+            case "manastorm_charge" -> {
+                addBlock(blocks, 2, 1, 0, addPaletteEntry(palette, "botania:mana_spreader"));
+                addBlock(blocks, 2, 1, 3, addPaletteEntry(palette, "botania:mana_bomb"));
+            }
+            default -> throw new IllegalArgumentException("Unknown automation scene: " + path);
+        }
+        return write(output, "automation/" + path, root(palette, blocks, 5, height, 5));
+    }
+
+    private CompletableFuture<?> advancedManaDevices(CachedOutput output) {
+        return CompletableFuture.allOf(
+            advancedManaDevice(output, "redstone_spreader"),
+            advancedManaDevice(output, "elven_spreader"),
+            advancedManaDevice(output, "gaia_spreader"),
+            advancedManaDevice(output, "mana_pylon"),
+            advancedManaDevice(output, "natura_pylon"),
+            advancedManaDevice(output, "gaia_pylon")
+        );
+    }
+
+    private CompletableFuture<?> advancedManaDevice(CachedOutput output, String path) {
+        ListTag palette = new ListTag();
+        ListTag blocks = new ListTag();
+        int size = path.equals("gaia_pylon") ? 9 : path.equals("gaia_spreader") ? 7 : 5;
+        checkerboardFloor(palette, blocks, size);
+        int height = 4;
+        switch (path) {
+            case "redstone_spreader" -> {
+                addBlock(blocks, 2, 1, 1, addPaletteEntry(palette, "botania:redstone_spreader"));
+                addBlock(blocks, 1, 1, 1,
+                    addPaletteEntry(palette, "minecraft:lever", "powered", "false"));
+                addBlock(blocks, 2, 1, 4, addPaletteEntry(palette, "botania:mana_pool"));
+            }
+            case "elven_spreader" -> {
+                addBlock(blocks, 2, 1, 1, addPaletteEntry(palette, "botania:elven_spreader"));
+                addBlock(blocks, 2, 1, 4, addPaletteEntry(palette, "botania:mana_pool"));
+            }
+            case "gaia_spreader" -> {
+                addBlock(blocks, 3, 1, 1, addPaletteEntry(palette, "botania:gaia_spreader"));
+                addBlock(blocks, 3, 1, 6, addPaletteEntry(palette, "botania:mana_pool"));
+            }
+            case "mana_pylon" -> {
+                addBlockEntity(blocks, 1, 1, 2, addPaletteEntry(palette, "botania:mana_pylon"), "botania:pylon");
+                addBlockEntity(blocks, 3, 1, 2, addPaletteEntry(palette, "botania:mana_pylon"), "botania:pylon");
+                addBlock(blocks, 2, 1, 3, addPaletteEntry(palette, "minecraft:enchanting_table"));
+            }
+            case "natura_pylon" -> {
+                addBlock(blocks, 2, 1, 1, addPaletteEntry(palette, "botania:mana_pool"));
+                addBlockEntity(blocks, 2, 2, 1, addPaletteEntry(palette, "botania:natura_pylon"), "botania:pylon");
+                addBlock(blocks, 2, 1, 4, addPaletteEntry(palette, "botania:alfheim_portal"));
+                height = 4;
+            }
+            case "gaia_pylon" -> {
+                addBlock(blocks, 4, 1, 4, addPaletteEntry(palette, "minecraft:beacon"));
+                int iron = addPaletteEntry(palette, "minecraft:iron_block");
+                int pylon = addPaletteEntry(palette, "botania:gaia_pylon");
+                for (int x : new int[] { 0, 8 }) {
+                    for (int z : new int[] { 0, 8 }) {
+                        addBlock(blocks, x, 1, z, iron);
+                        addBlockEntity(blocks, x, 2, z, pylon, "botania:pylon");
+                    }
+                }
+            }
+            default -> throw new IllegalArgumentException("Unknown advanced Mana device: " + path);
+        }
+        return write(output, "mana_devices/" + path, root(palette, blocks, size, height, size));
+    }
+
+    private CompletableFuture<?> remainingUtilityBlocks(CachedOutput output) {
+        return CompletableFuture.allOf(
+            remainingUtilityBlock(output, "force_relay"), remainingUtilityBlock(output, "tiny_potato"),
+            remainingUtilityBlock(output, "incense_plate"), remainingUtilityBlock(output, "cacophonium"),
+            remainingUtilityBlock(output, "teru_teru_bozu"), remainingUtilityBlock(output, "avatar"),
+            remainingUtilityBlock(output, "animated_torch"), remainingUtilityBlock(output, "cocoon"),
+            remainingUtilityBlock(output, "fel_pumpkin"), remainingUtilityBlock(output, "starfield")
+        );
+    }
+
+    private CompletableFuture<?> remainingUtilityBlock(CachedOutput output, String path) {
+        ListTag palette = new ListTag(); ListTag blocks = new ListTag(); checkerboardFloor(palette, blocks, 5);
+        int height = 5;
+        switch (path) {
+            case "force_relay" -> {
+                addBlock(blocks, 0, 1, 2, addPaletteEntry(palette, "minecraft:piston", "facing", "east"));
+                addBlock(blocks, 1, 1, 2, addPaletteEntry(palette, "botania:piston_relay"));
+                addBlock(blocks, 3, 1, 2, addPaletteEntry(palette, "minecraft:diamond_block"));
+            }
+            case "tiny_potato" -> addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:tiny_potato"), "botania:tiny_potato");
+            case "incense_plate" -> addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:incense_plate", "facing", "south"), "botania:incense_plate");
+            case "cacophonium" -> {
+                addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:cacophonium_block"), "botania:cacophonium_block");
+                addBlock(blocks, 1, 1, 2, addPaletteEntry(palette, "minecraft:lever", "powered", "false"));
+            }
+            case "teru_teru_bozu" -> addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:teru_teru_bozu"), "botania:teru_teru_bozu");
+            case "avatar" -> addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:avatar"), "botania:avatar");
+            case "animated_torch" -> {
+                addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:animated_torch"), "botania:animated_torch");
+                addBlock(blocks, 3, 1, 2, addPaletteEntry(palette, "minecraft:redstone_lamp"));
+            }
+            case "cocoon" -> addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:cocoon"), "botania:cocoon");
+            case "fel_pumpkin" -> {
+                int bars = addPaletteEntry(palette, "minecraft:iron_bars");
+                addBlock(blocks, 2, 1, 2, bars); addBlock(blocks, 2, 2, 2, bars);
+                addBlock(blocks, 2, 3, 2, addPaletteEntry(palette, "botania:fel_pumpkin", "facing", "south"));
+            }
+            case "starfield" -> addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:starfield"), "botania:starfield");
+            default -> throw new IllegalArgumentException("Unknown remaining utility scene: " + path);
+        }
+        return write(output, "remaining_utility/" + path, root(palette, blocks, 5, height, 5));
+    }
+
+    private CompletableFuture<?> luminizerBlocks(CachedOutput output) {
+        return CompletableFuture.allOf(
+            luminizerBlock(output, "spectral_rail"), luminizerBlock(output, "default"),
+            luminizerBlock(output, "fork"), luminizerBlock(output, "toggle"),
+            luminizerBlock(output, "detector"), luminizerBlock(output, "launcher")
+        );
+    }
+
+    private CompletableFuture<?> luminizerBlock(CachedOutput output, String path) {
+        ListTag palette = new ListTag(); ListTag blocks = new ListTag(); checkerboardFloor(palette, blocks, 5);
+        int height = 5;
+        switch (path) {
+            case "spectral_rail" -> {
+                addBlock(blocks, 1, 1, 2, addPaletteEntry(palette, "botania:ghost_rail", "shape", "east_west"));
+                addBlock(blocks, 3, 1, 2, addPaletteEntry(palette, "minecraft:stone"));
+                addBlock(blocks, 3, 2, 2, addPaletteEntry(palette, "minecraft:stone"));
+            }
+            case "default" -> {
+                addBlockEntity(blocks, 1, 2, 2, addPaletteEntry(palette, "botania:light_relay"), "botania:light_relay");
+                addBlockEntity(blocks, 3, 2, 2, addPaletteEntry(palette, "botania:light_relay"), "botania:light_relay");
+            }
+            case "fork" -> {
+                addBlockEntity(blocks, 1, 2, 2, addPaletteEntry(palette, "botania:light_relay"), "botania:light_relay");
+                addBlockEntity(blocks, 3, 2, 2, addPaletteEntry(palette, "botania:fork_light_relay"), "botania:light_relay");
+                addBlockEntity(blocks, 3, 2, 4, addPaletteEntry(palette, "botania:light_relay"), "botania:light_relay");
+            }
+            case "toggle" -> {
+                addBlockEntity(blocks, 1, 2, 2, addPaletteEntry(palette, "botania:light_relay"), "botania:light_relay");
+                addBlockEntity(blocks, 3, 2, 2, addPaletteEntry(palette, "botania:toggle_light_relay", "powered", "false"), "botania:light_relay");
+                addBlockEntity(blocks, 3, 2, 4, addPaletteEntry(palette, "botania:light_relay"), "botania:light_relay");
+                addBlock(blocks, 2, 1, 2, addPaletteEntry(palette, "minecraft:lever", "powered", "false"));
+            }
+            case "detector" -> {
+                addBlockEntity(blocks, 1, 2, 2, addPaletteEntry(palette, "botania:light_relay"), "botania:light_relay");
+                addBlockEntity(blocks, 3, 2, 2, addPaletteEntry(palette, "botania:detector_light_relay", "powered", "false"), "botania:light_relay");
+                addBlock(blocks, 3, 1, 3, addPaletteEntry(palette, "minecraft:redstone_lamp"));
+            }
+            case "launcher" -> {
+                addBlockEntity(blocks, 2, 2, 2, addPaletteEntry(palette, "botania:light_relay"), "botania:light_relay");
+                addBlock(blocks, 2, 1, 4, addPaletteEntry(palette, "botania:light_launcher"));
+            }
+            default -> throw new IllegalArgumentException("Unknown Luminizer scene: " + path);
+        }
+        return write(output, "luminizer/" + path, root(palette, blocks, 5, height, 5));
     }
 
     private static CompoundTag root(ListTag palette, ListTag blocks, int sx, int sy, int sz) {
@@ -682,6 +1159,20 @@ public class BotaniaPonderStructureProvider implements DataProvider {
         CompoundTag block = new CompoundTag();
         block.put("pos", intList(x, y, z));
         block.putInt("state", paletteIndex);
+        blocks.add(block);
+    }
+
+    private static void addBlockEntity(ListTag blocks, int x, int y, int z,
+                                       int paletteIndex, String blockEntityId) {
+        CompoundTag block = new CompoundTag();
+        block.put("pos", intList(x, y, z));
+        block.putInt("state", paletteIndex);
+        CompoundTag blockEntity = new CompoundTag();
+        blockEntity.putString("id", blockEntityId);
+        blockEntity.putInt("x", x);
+        blockEntity.putInt("y", y);
+        blockEntity.putInt("z", z);
+        block.put("nbt", blockEntity);
         blocks.add(block);
     }
 

@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+## 1.2.0 — 2026-08-13
+
+- Completed the 135-scene block/device milestone with the final sixteen scenes: Force Relay,
+  Tiny Potato, Incense Plate, Cacophonium, Teru Teru Bozu, Avatar, Animated Torch, Cocoon,
+  Fel Pumpkin, Starfield Creator, Spectral Rail, and all five Luminizer behaviors.
+- Completed the planned advanced Mana Device chapter with focused scenes for the Redstone, Elven,
+  and Gaia Spreaders and the Mana, Natura, and Gaia Pylons.
+- Added a maintained scene coverage audit with category totals, a 22-scene block/device backlog,
+  and separately tracked future item and equipment chapters.
+
+- Added seven focused automation scenes for the Crafty Crate, Mana Pump, Hovering Hourglass,
+  Manastorm Charge, and all three platform variants.
+- Kept the camera fixed after scene initialization in Advanced Crafting, Utility, and Automation
+  scenes, removing the visible vertical jump when the Alchemy Catalyst's Mana Pool appears.
+- Added the required Platform block-entity data to generated schematics so Forge can resolve the
+  native Abstruse, Spectral, and Infrangible Platform models instead of the missing-model fallback.
+- Pinned all three platform scenes to one camera focus across every reveal. Their native Forge
+  models remain blocked by PonderLib 0.7.3 baking captured sections with empty model data.
+
+- Updated to PonderLib 0.7.3, including the vanilla private-access rework and resolved captured
+  fire/Mana Flame section rendering issues.
+- Added the complete core Corporea request chapter: Index, Funnel, Crystal Cube, Interceptor and
+  Retainer, with focused request, counting, failure-detection and replay demonstrations.
+- Fixed the text-overlap audit so scenes with the same Java method name in different scene classes
+  are checked independently.
+- Added the complete Drum family: separate focused scenes for the Drum of the Wild, Drum of the
+  Canopy, and the Gathering Drum's shearing, milking, and egg-timer mechanics.
+- Added an Advanced Mana Crafting chapter for the Alchemy Catalyst, Conjuration Catalyst,
+  Terrestrial Agglomeration Plate, Mana Enchanter, and Alfheim Portal.
+- Added eight focused utility scenes for the Ender Overseer, Eye of the Ancients, Mana Fluxfield,
+  Life Imbuer, Mana Prism, Spark Tinkerer, Bellows, and Tiny Planet.
+
 ## 1.1.1 — 2026-08-10
 
 - Updated to PonderLib 0.7.2 (idle() timeline-blocking fix, hold-to-ponder localisation, scene

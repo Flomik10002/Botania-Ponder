@@ -171,10 +171,10 @@ dependencies {
     // v0.5.0 includes synchronized visible sections/BlockEntity states, fluid rendering,
     // named keyframes, navigation categories, custom elements, sounds and Ponder Doctor.
     // v0.7.0 predates the native eased/collision-free entity movement used for the Mana Pool
-    // diamond drop (see docs/PONDERLIB_FIXES.md); v0.7.1 predates a production-Forge
-    // SchematicLoader crash fix; v0.7.2 predates an idle()-not-blocking-the-timeline fix plus
-    // the ported hold-to-ponder localisation and scene info plaque.
-    implementation fg.deobf('com.github.Flomik10002:PonderLib:v0.7.2-forge-1.20.1')
+    // diamond drop (see docs/PONDERLIB_FIXES.md); v0.7.1 fixes production Forge schematic loading;
+    // v0.7.2 fixes idle() timeline blocking; v0.7.3 replaces fragile vanilla reflection with
+    // access transformers/accessor mixins and fixes the remaining captured-section render issues.
+    implementation fg.deobf('com.github.Flomik10002:PonderLib:v0.7.3-forge-1.20.1')
 
     // Botania - the mod this addon documents. fg.deobf() is required here for the same reason.
     // The FULL jar, not the ':api' classifier, on purpose: scenes here drive Botania's own block

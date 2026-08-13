@@ -49,6 +49,7 @@ public final class ManaSpreaderScenes {
         scene.idle(15);
 
         scene.world().showSection(util.select().position(spreaderPos), Direction.DOWN);
+        aimSpreader(scene, spreaderPos, targetPos);
         scene.idle(10);
         scene.overlay().showOutlineWithText(util.select().position(spreaderPos), 80,
                 "A Mana Spreader holds a small internal buffer of Mana, and needs a source to fill it")
@@ -185,6 +186,18 @@ public final class ManaSpreaderScenes {
             scene.effects().emitParticles(from.add(path.scale((double) i / steps)), emitter, 2, 1);
             scene.idle(1);
         }
+    }
+
+    static void aimSpreader(SceneBuilder scene, BlockPos spreaderPos, BlockPos targetPos) {
+        double dx = targetPos.getX() - spreaderPos.getX();
+        double dy = targetPos.getY() - spreaderPos.getY();
+        double dz = targetPos.getZ() - spreaderPos.getZ();
+        float yaw = (float) ((Math.toDegrees(Math.atan2(dx, dz)) + 90D + 360D) % 360D);
+        float pitch = (float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
+        scene.world().modifyBlockEntity(spreaderPos, ManaSpreaderBlockEntity.class, spreader -> {
+            spreader.rotationX = yaw;
+            spreader.rotationY = pitch;
+        });
     }
 
     private static void transferManaSmoothly(SceneBuilder scene, BlockPos spreaderPos,

@@ -75,6 +75,7 @@ public final class RunicAltarScenes {
         scene.world().modifyBlockEntity(altarPos, RunicAltarBlockEntity.class,
             altar -> altar.manaToGet = RUNE_OF_WATER_MANA);
         scene.world().showSection(util.select().position(spreaderPos), Direction.DOWN);
+        ManaSpreaderScenes.aimSpreader(scene, spreaderPos, altarPos);
         focusOn(scene, altarCenter);
         scene.idle(10);
         scene.overlay().showText(60, "A Mana Spreader supplies the Mana required by the recipe")
