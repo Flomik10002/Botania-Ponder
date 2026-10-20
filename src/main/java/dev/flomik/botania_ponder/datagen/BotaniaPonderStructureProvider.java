@@ -19,6 +19,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 /**
  * Writes the Ponder schematics under {@code assets/botania_ponder/ponder/*.nbt} by hand, as a
@@ -1004,7 +1005,9 @@ public class BotaniaPonderStructureProvider implements DataProvider {
                 addBlock(blocks, 1, 1, 2, addPaletteEntry(palette, "botania:piston_relay"));
                 addBlock(blocks, 3, 1, 2, addPaletteEntry(palette, "minecraft:diamond_block"));
             }
-            case "tiny_potato" -> addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:tiny_potato"), "botania:tiny_potato");
+            case "tiny_potato" -> addBlockEntity(blocks, 2, 1, 2,
+                addPaletteEntry(palette, "botania:tiny_potato"), "botania:tiny_potato",
+                nbt -> nbt.putString("name", "\"\""));
             case "incense_plate" -> addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:incense_plate", "facing", "south"), "botania:incense_plate");
             case "cacophonium" -> {
                 addBlockEntity(blocks, 2, 1, 2, addPaletteEntry(palette, "botania:cacophonium_block"), "botania:cacophonium_block");
@@ -1164,6 +1167,12 @@ public class BotaniaPonderStructureProvider implements DataProvider {
 
     private static void addBlockEntity(ListTag blocks, int x, int y, int z,
                                        int paletteIndex, String blockEntityId) {
+        addBlockEntity(blocks, x, y, z, paletteIndex, blockEntityId, nbt -> {});
+    }
+
+    private static void addBlockEntity(ListTag blocks, int x, int y, int z,
+                                       int paletteIndex, String blockEntityId,
+                                       Consumer<CompoundTag> configureNbt) {
         CompoundTag block = new CompoundTag();
         block.put("pos", intList(x, y, z));
         block.putInt("state", paletteIndex);
@@ -1172,6 +1181,7 @@ public class BotaniaPonderStructureProvider implements DataProvider {
         blockEntity.putInt("x", x);
         blockEntity.putInt("y", y);
         blockEntity.putInt("z", z);
+        configureNbt.accept(blockEntity);
         block.put("nbt", blockEntity);
         blocks.add(block);
     }
