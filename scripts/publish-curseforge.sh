@@ -479,7 +479,7 @@ for i in "${!PLAN_TAG[@]}"; do
 
   http_status="$(curl -s -o "$http_response_file" -w '%{http_code}' \
     -H "X-Api-Token: $CURSEFORGE_API_TOKEN" \
-    -F "metadata=$metadata_json" \
+    --form-string "metadata=$metadata_json" \
     -F "file=@${jar_path}" \
     "https://minecraft.curseforge.com/api/projects/${CF_PROJECT_ID}/upload-file")"
 
